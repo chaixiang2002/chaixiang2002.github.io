@@ -18,7 +18,7 @@ my beautiful picture:
            \\//
             \/
             
-![chaixiang](dog.jpg)
+![chaixiang](source/picture/dog.jpg)
 
 
 我是狗子
