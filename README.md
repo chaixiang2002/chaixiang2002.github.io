@@ -1,4 +1,4 @@
-# do you know "hello world" 
+# do you know "hello world"
 
 * this is my first work!
 
@@ -6,7 +6,7 @@
 > i am a newbie codeman at this time,
 > but I am goning to become a grant codeman.
 
-Let me show you 
+Let me show you
 
 my beautiful picture:
 
@@ -17,9 +17,8 @@ my beautiful picture:
           \\  //
            \\//
             \/
-            
-![chaixiang](source/picture/dog.jpg)
 
+![chaixiang](source/picture/dog.jpg)
 
 我是狗子
 
