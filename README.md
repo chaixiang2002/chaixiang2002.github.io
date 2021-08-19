@@ -1,4 +1,4 @@
-# do you know "hello world"
+# chai's frist blog
 
 * this is my first work!
 
