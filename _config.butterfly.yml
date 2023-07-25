@@ -4,12 +4,12 @@
 
 # Site
 title: 欢迎来到柴祥的博客
-subtitle: ''
-description: ''
+subtitle: '这是SnowChar的私人博客'
+description: '这将会是一个新的开始'
 keywords:
 author: 柴祥
 language: zh-cn
-timezone: ''
+timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
