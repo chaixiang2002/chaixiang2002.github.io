@@ -4,16 +4,16 @@
 
 # Site
 title: 欢迎来到柴祥的博客
-subtitle: '这是SnowChar的私人博客'
-description: '这将会是一个新的开始'
+subtitle: ''
+description: ''
 keywords:
 author: 柴祥
 language: zh-cn
-timezone: 'Asia/Shanghai'
+timezone: ''
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://121.40.130.2:8084
+url: http://example.com
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -103,8 +103,3 @@ theme: butterfly
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: ''
-
-
-aplayer:
-  meting: true
-  asset_inject: false
