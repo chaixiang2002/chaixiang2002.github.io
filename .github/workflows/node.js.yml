@@ -43,6 +43,6 @@ jobs:
         username: ${{ secrets.USERNAME }} #你的nginx服务器用户名
         password: ${{ secrets.PASSWORD }} #你的nginx服务器密码
         localDir: "docs" #你vue项目build好的文件的路径,每次服务器上会自动删除对应的文件夹后重新覆盖
-        remoteDir: /root/code/chaixiangio/ #你要把你build好的文件夹放到nginx服务器上的什么位置
+        remoteDir: /var/lib/docker/volumes/blogio/_data/ #你要把你build好的文件夹放到nginx服务器上的什么位置
 
 
