@@ -11,7 +11,7 @@ author: 柴祥
 language: zh-cn
 timezone: 'Asia/Shanghai'
 
-# URL
+# URL 文章下面的链接
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
 url: http://121.40.130.2:8084
 permalink: :year/:month/:day/:title/
@@ -20,7 +20,7 @@ pretty_urls:
   trailing_index: true # Set to false to remove trailing 'index.html' from permalinks
   trailing_html: true # Set to false to remove trailing '.html' from permalinks
 
-# Directory
+# Directory 文件目录地址配置
 source_dir: source
 public_dir: docs
 tag_dir: tags
@@ -108,3 +108,9 @@ deploy:
 aplayer:
   meting: true
   asset_inject: false
+
+# 导航栏设置 (Navigation bar settings)
+nav:
+  logo: https://avatars.githubusercontent.com/u/84395046?v=4
+  display_title: true
+  fixed: false # fixed navigation bar

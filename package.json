@@ -12,6 +12,7 @@
     "version": "5.4.2"
   },
   "dependencies": {
+    "gitalk": "^1.8.0",
     "hexo": "^5.0.0",
     "hexo-asset-img": "^1.0.0",
     "hexo-generator-archive": "^1.0.0",
