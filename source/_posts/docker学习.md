@@ -8,13 +8,13 @@ categories:
 tags:
 lang:
 ---
-
+### 链接
 
 [05-初识Docker-Docker的安装_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1LQ4y127n4?p=46&spm_id_from=pageDriver&vd_source=f30dd07ede5a1255c0b1aaf0d2788938)
 
 [vuepress.mirror.docker-practice.com](https://vuepress.mirror.docker-practice.com/)
 
-![](https://regws02vdj.feishu.cn/space/api/box/stream/download/asynccode/?code=NzdhZTdjMDg4MzAxMGFlMmZhYzRjMTM5Mzc4MTY2YmFfSkppQWdaWVZWQ21Td2E3bWpMU09BbllnSXlHajJMOHlfVG9rZW46TXR3cWIyYTNJb2pZUnJ4a09Fd2NsQTdqbkZkXzE2OTA2NDI0NjM6MTY5MDY0NjA2M19WNA)
+![](https://regws02vdj.feishu.cn/space/api/box/stream/download/asynccode/?code=NzdhZTdjMDg4MzAxMGFlMmZhYzRjMTM5Mzc4MTY2YmFfSkppQWdaWVZWQ21Td2E3bWpMU09BbllnSXlHajJMOHlfVG9rZW46TXR3cWIyYTNJb2pZUnJ4a09Fd2NsQTdqbkZkXzE2OTA2NDI0NjM6MTY5MDY0NjA2M19WNA)[前言 · Docker -- 从入门到实践 (docker-practice.github.io)](https://docker-practice.github.io/zh-cn/#docker-%E2%80%94-%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E8%B7%B5)
 
 ![](https://regws02vdj.feishu.cn/space/api/box/stream/download/asynccode/?code=NTAyZWUwMGFkYzVkYjEyNDMxN2E5OTYxY2ZkN2NmZTJfclpHekZvblNzS2JBOXpRaFJNSG1UNHJZNU5TSG15UVNfVG9rZW46R29MOGJ3ZUVwbzIwZjZ4TzBacGN3SEN6bk9kXzE2OTA2NDI0NjM6MTY5MDY0NjA2M19WNA)
 
@@ -31,7 +31,6 @@ https://hub.docker.com/_/nginx
 [10-使用Docker-容器命令案例2_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1LQ4y127n4?p=51&spm_id_from=pageDriver&vd_source=f30dd07ede5a1255c0b1aaf0d2788938)
 
 ![](https://regws02vdj.feishu.cn/space/api/box/stream/download/asynccode/?code=YTc0NTFhYTNkMzQwMDFmOGQ2MWExOTQwMGYwYWEyYzZfZ1Q1SVEySTd2c0JBQzNIVkI0dllDZ24zVEk2T3RwTGpfVG9rZW46VnhFNWIxbHA2bzE5emZ4bTlLMmNrdFJsbmtlXzE2OTA2NDI0NjM6MTY5MDY0NjA2M19WNA)
-
 
 1. dockerCompose
 2. 基于docker的微服务部署
