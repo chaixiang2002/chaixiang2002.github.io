@@ -32,17 +32,18 @@ jobs:
     # - name: Build the Docker image
     #   run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
     
-    # - name: 自动同步文件夹到我的服务器
+    - name: 自动同步文件夹到我的服务器
     
-    # # You may pin to the exact commit or the version.
-    # # uses: wangyucode/sftp-upload-action@24f8bb83383dc39bed201ee5da01475e6c38c568
-    #   uses: wangyucode/sftp-upload-action@v2.0.2
-    #   with:
-    #     host: ${{ secrets.SERVER_IP }}  #你的nginx服务器公网ip
-    #     port: ${{ secrets.SERVER_PORT }} #你的nginx服务器ssh端口
-    #     username: ${{ secrets.USERNAME }} #你的nginx服务器用户名
-    #     password: ${{ secrets.PASSWORD }} #你的nginx服务器密码
-    #     localDir: "docs" #你vue项目build好的文件的路径,每次服务器上会自动删除对应的文件夹后重新覆盖
-    #     remoteDir: /var/lib/docker/volumes/blogio/_data/ #你要把你build好的文件夹放到nginx服务器上的什么位置
+    # You may pin to the exact commit or the version.
+    # uses: wangyucode/sftp-upload-action@24f8bb83383dc39bed201ee5da01475e6c38c568
+      uses: wangyucode/sftp-upload-action@v2.0.2
+      with:
+        host: ${{ secrets.SERVER_IP }}  #你的nginx服务器公网ip
+        port: ${{ secrets.SERVER_PORT }} #你的nginx服务器ssh端口
+        username: ${{ secrets.USERNAME }} #你的nginx服务器用户名
+        password: ${{ secrets.PASSWORD }} #你的nginx服务器密码
+        forceUpload: true
+        localDir: "docs" #你vue项目build好的文件的路径,每次服务器上会自动删除对应的文件夹后重新覆盖
+        remoteDir: /var/lib/docker/volumes/blogio/_data/ #你要把你build好的文件夹放到nginx服务器上的什么位置
 
 
