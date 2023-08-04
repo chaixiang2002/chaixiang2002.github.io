@@ -8,6 +8,27 @@ categories:
 tags:
 lang:
 ---
+# 坑
+
+##### 1. riscv64-unknown-elf-gcc 找不到头文件
+
+解决方法：[howto-run-with-ubuntu1804_zh.md · unicornx/riscv-operating-system-mooc - Gitee.com](https://gitee.com/unicornx/riscv-operating-system-mooc/blob/main/howto-run-with-ubuntu1804_zh.md)
+
+
+
+##### 2. qemu-system-riscv32: error while loading shared libraries: libncursesw.so.6: cannot open shared object file: No such file or directory
+
+解决方法：[环境配置问题 :qemu-system-riscv32: error while loading shared libraries: libncursesw.so.6: cannot open shared object file: No such file or directory · Issue #I477IX · unicornx/riscv-operating-system-mooc - Gitee.com](https://gitee.com/unicornx/riscv-operating-system-mooc/issues/I477IX)
+
+
+
+
+
+
+
+
+
+
 # 第一章 计算机系统漫游
 
 ##### 计算机硬件组成
@@ -201,9 +222,6 @@ X-only只能执行
 
 ![1691054568999](image/RISC-V系统学习/1691054568999.png)
 
-
-
-
 # 第三章 编译和链接
 
 ##### gcc
@@ -213,25 +231,15 @@ X-only只能执行
 - -c：编译成机器语言		as
 - 无参数：链接，链接一些标准库成为最终可执行文件		ld
 
-
-
-
-
-
 ![1691073312723](image/RISC-V系统学习/1691073312723.png)
 
-
-
 ![1691073997611](image/RISC-V系统学习/1691073997611.png)
-
-
 
 ![1691074104045](image/RISC-V系统学习/1691074104045.png)
 
 ##### ELF文件格式
 
 ![1691074405644](image/RISC-V系统学习/1691074405644.png)
-
 
 ![1691074279668](image/RISC-V系统学习/1691074279668.png)
 
@@ -243,20 +251,15 @@ X-only只能执行
 - .text：放指令
 - .init：初始化指令
 - .data：数组，全局变量
-
-
 - Section Header Table：链接视图，知道有哪些节，有多大，在什么位置
 
 ![1691076015849](image/RISC-V系统学习/1691076015849.png)
-
 
 ##### Binutils
 
 ![1691076077763](image/RISC-V系统学习/1691076077763.png)
 
-
 ![1691076736930](image/RISC-V系统学习/1691076736930.png)
-
 
 ##### objdump反汇编
 
@@ -266,10 +269,169 @@ X-only只能执行
 
 
 
+# 第四章 嵌入式开发
+
+
+
+![1691131745673](image/RISC-V系统学习/1691131745673.png)
+
+
+![1691131883738](image/RISC-V系统学习/1691131883738.png)
+
+
+##### 交叉编译
+
+- 构建系统
+- 主机系统
+- 目标系统
+
+本地编译：都在一台机器上
+
+交叉编译：目标系统不是同一台
+
+![1691132020876](image/RISC-V系统学习/1691132020876.png)
+
+
+1. 用x86_64gcc做一个RISCV64的gcc编译器
+2. 让然后用这个编译器编译源代码
+
+![1691132463113](image/RISC-V系统学习/1691132463113.png)
+
+
+
+##### GDB
+
+> gdb  a.out
+
+gdb会fork一个子进程跑我们的程序，当进程跑到我们的断点时，gdb会挂起这个进程，此时就可以读寄存器，看相关的值
+
+远程调试时，目标系统会跑一个gdb-server来代理我们的操作。
+
+![1691132831141](image/RISC-V系统学习/1691132831141.png)
+
+
+
+![1691133041787](image/RISC-V系统学习/1691133041787.png)
 
 
 
 
 
+```shell
+snow@snow$ riscv64-unknown-elf-gcc -march=rv32ima -mabi=ilp32 hello.c
+snow@snow$ gcc hello.c -o a_x86.out
+snow@snow$ file a.out
+a.out:     ELF 32-bit LSB executable, UCB RISC-V, soft-float ABI, version 1 (SYSV), statically linked, with debug_info, not stripped
+snow@snow$ file a_x86.out
+a_x86.out: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=e374fe264738f54f3249dae124c2308601f46db3, for GNU/Linux 3.2.0, not stripped
+```
+
+
+
+![1691140538175](image/RISC-V系统学习/1691140538175.png)
+
+
+
+
+
+##### MakeFile
+
+![1691156348163](image/RISC-V系统学习/1691156348163.png)
+
+
+
+![1691156433714](image/RISC-V系统学习/1691156433714.png)
+
+
+
+
+第五章 汇编语言编程
+
+![1691158572630](image/RISC-V系统学习/1691158572630.png)
+
+
+
+![1691158861213](image/RISC-V系统学习/1691158861213.png)
+
+
+
+![1691159239603](image/RISC-V系统学习/1691159239603.png)
+
+
+
+- label		标志
+  ：结尾
+- operation	操作
+  1. instruction：对应二进制指令
+  2. pseudo-instruction：伪指令 ，实际上是多条指令
+  3. directive：伪操作， “.”开头，类似自定义函数
+  4. macro:   .macro和.endm 的 自定义宏
+- comment		注释  #开头
+
+![1691159739525](image/RISC-V系统学习/1691159739525.png)
+
+
+
+##### 汇编指令操作对象
+
+![1691161113352](image/RISC-V系统学习/1691161113352.png)
+
+寄存器
+
+1. 可以操作的有32个通用寄存器
+2. 执行算数运算、逻辑运算时，只能对寄存器上的数据运算
+3. hart是运算的最小单元，也就是一个执行流，以前的cpu一个核只有一个hart
+
+内存
+
+1. hart可以在内存与寄存器之间读写
+2. 读写操作时，字节是最小单位，一个字节一个字节寻址，每个字节都有一个地址
+3. RV最大可以访问2^32给字节
+
+![1691161278779](image/RISC-V系统学习/1691161278779.png)
+
+
+
+![1691162233550](image/RISC-V系统学习/1691162233550.png)
+
+
+
+![1691162305051](image/RISC-V系统学习/1691162305051.png)
+
+
+
+![1691162446183](image/RISC-V系统学习/1691162446183.png)
+
+
+
+##### 小端序
+
+- 主机字节序
+- 大端序
+- 小端序
+
+![1691162537665](image/RISC-V系统学习/1691162537665.png)
+
+
+
+RISC-V是小端序
+
+![1691162761566](image/RISC-V系统学习/1691162761566.png)
+
+
+
+![1691163080444](image/RISC-V系统学习/1691163080444.png)
+
+##### 汇编指令分类
+
+![1691163187563](image/RISC-V系统学习/1691163187563.png)
+
+
+
+![1691163262986](image/RISC-V系统学习/1691163262986.png)
+
+
+
+![1691163422923](image/RISC-V系统学习/1691163422923.png)
 
 a
