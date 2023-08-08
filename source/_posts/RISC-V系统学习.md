@@ -21,6 +21,12 @@ lang:
 3. ##### make debug 总是处于之前的进程，
 
    ![1691312336286](image/RISC-V系统学习/1691312336286.png)
+4. ##### 汇编里.xx 是什么？伪操作和宏 directive
+
+   - .end代表文件结束了
+   - macro是宏，
+   - .global 类似全局变量
+5. ![1691486889059](image/RISC-V系统学习/1691486889059.png)![1691486148548](image/RISC-V系统学习/1691486148548.png)[汇编（一）：risc-v汇编语法 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/588075416)
 
 # 第一章 计算机系统漫游
 
@@ -312,7 +318,7 @@ a_x86.out: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically 
 
 ![1691156433714](image/RISC-V系统学习/1691156433714.png)
 
-第五章 汇编语言编程
+# 第五章 汇编语言编程
 
 ![1691158572630](image/RISC-V系统学习/1691158572630.png)
 
@@ -649,7 +655,7 @@ aa_bb:
 	mv a0, s2													# 把结果 s2 赋给 a0参数寄存器，为什么用a0 存呀？
 
 	# epilogue
-	lw s0, 0(sp)			# 把 栈指针0字节处的值 恢复给 s0		
+	lw s0, 0(sp)			# 把 栈指针0字节处的值 恢复给 s0	
 	lw s1, 4(sp)			# 把 栈指针4字节处的值 恢复给 s1
 	lw s2, 8(sp)			# 把 栈指针8字节处的值 恢复给 s2
 	lw ra, 12(sp)			# 把 栈指针12字节处的值 恢复给 ra
