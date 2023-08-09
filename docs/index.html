@@ -55,7 +55,7 @@
   isHome: true,
   isHighlightShrink: false,
   isToc: false,
-  postUpdate: '2023-08-08 23:26:16'
+  postUpdate: '2023-08-09 23:10:26'
 }</script><noscript><style type="text/css">
   #nav {
     opacity: 1
@@ -169,67 +169,17 @@
 选择搜索效果高亮的插件
 
 </div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2023/08/07/RISC-V%E5%AD%A6%E4%B9%A02/" title="RISC-V学习2">RISC-V学习2</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2023-08-07T11:22:24.000Z" title="Created 2023-08-07 19:22:24">2023-08-07</time></span></div><div class="content">坑疑问1. OS 02 内存管理，这里什么意思？？？
-
-为什么 栈指针sp要加上(hart id * 2^10),而且haerid，不就是0吗？这样的意义是什么？
-
-
-
-第5章 汇编和C的相互调用
-
-volatile: 不优化的关键字
-asm：汇编关键字
+2. 为什么 栈指针sp要加上(hart id * 2^10),而且haerid，不就是0吗？这样的意义是什么？
+3. C 内嵌 汇编语法risc-v GCC内嵌汇编 - sureZ_ok - 博客园 (cnblogs.com)
 
 
-r相当于C语言里建议编译器的register关键字
+“r”(x)            输入变量，把x的值放入一个寄存器
+“=r”(sum)        输出变量，把sum的值放入一个寄存器，最终要输出
+“+r”(i)            既是输入，又是输出
 
-第6章  RVOS 介绍
-
-
-Machine模式        访问物理地址
-User模式            物理内存保护
-Supervisor模式    支持虚拟地址
-
-
-
-
-
-内存分配
-多线程
-任务互斥
-软件定时器
-
-
-第7章 hello RCVS
-
-通过访问这些地址来访问这些元器件
-
-
-ROM掉电，数据还在
-
-
-0x8000是一个特殊的地址，内存的第一个指令必须在这
-
-
-
-CSRs：
-每一个模式都有一组自己的寄存器，这些寄存器叫 CSR寄存器
-
-
-
-一上电就是machine模式
-
-
-CSR指令：专门对这些寄存器的指令
-CSRRW
-
-该指令 是原子指令
-两步操作，对值”零扩展“ （也就是不足补零）
-
-
-CSRW
-
-
-该指令：读CSR值，写入RD，再对CSR根据RS1 s ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2023/08/03/RISC-V%E7%B3%BB%E7%BB%9F%E5%AD%A6%E4%B9%A0/" title="RISC-V系统学习">RISC-V系统学习</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2023-08-03T04:42:09.000Z" title="Created 2023-08-03 12:42:09">2023-08-03</time></span></div><div class="content">坑1.  riscv64-unknown-elf-gcc 找不到头文件解决方法：howto-run-with-ubuntu1804_zh.md · unicornx/riscv-operating-system-mooc - Gitee.com
+%0    %1    %2，表示第一、第二、第三个寄存器
+4. void (*start_routin)(void) 这个语法void (*start_routin)(void) 是一个函数指针的声明。它表示一个指向不返回任何值（void）且不接受任何参数的函数。
+在这个特定的上下文中，start_routin 是一个函数指针参数，用于指定任务的入口点。当调用 task_create 函数时，可以将一个函数的地址作为参数传递给 start_routin，这个函数就会成为新创建的任务的入口点。 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2023/08/03/RISC-V%E7%B3%BB%E7%BB%9F%E5%AD%A6%E4%B9%A0/" title="RISC-V系统学习">RISC-V系统学习</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2023-08-03T04:42:09.000Z" title="Created 2023-08-03 12:42:09">2023-08-03</time></span></div><div class="content">坑1.  riscv64-unknown-elf-gcc 找不到头文件解决方法：howto-run-with-ubuntu1804_zh.md · unicornx/riscv-operating-system-mooc - Gitee.com
 2. qemu-system-riscv32: error while loading shared libraries: libncursesw.so.6: cannot open shared object file: No such file or directory解决方法：环境配置问题 :qemu-system-riscv32: error while loading shared libraries: libncursesw.so.6: cannot open shared object file: No such file or directory · Issue #I477IX · unicornx/riscv-operating-system-mooc - Gitee.com
 
 make debug 总是处于之前的进程，
@@ -341,7 +291,7 @@ butterfly主题
             </div>
             <ul class="card-category-list" id="aside-cat-list">
             <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%8A%80%E6%9C%AF/"><span class="card-category-list-name">技术</span><span class="card-category-list-count">3</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%8A%80%E6%9C%AF%E7%B1%BB/"><span class="card-category-list-name">技术类</span><span class="card-category-list-count">1</span></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%8A%80%E6%9C%AF%E7%B1%BB/%E5%B0%8F%E6%8A%80%E5%B7%A7/"><span class="card-category-list-name">小技巧</span><span class="card-category-list-count">1</span></a></li></ul></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%97%A5%E8%AE%B0/"><span class="card-category-list-name">日记</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%9D%82%E9%A1%B9/"><span class="card-category-list-name">杂项</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E9%9D%9E%E6%8A%80%E6%9C%AF/"><span class="card-category-list-name">非技术</span><span class="card-category-list-count">5</span></a></li>
-            </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/%E5%86%85%E5%BF%83/" style="font-size: 1.1em; color: #999">内心</a> <a href="/tags/%E8%AF%BB%E5%90%8E%E6%84%9F/" style="font-size: 1.1em; color: #999">读后感</a> <a href="/tags/%E6%96%87%E5%AD%A6/" style="font-size: 1.1em; color: #999">文学</a> <a href="/tags/%E9%B2%81%E8%BF%85/" style="font-size: 1.1em; color: #999">鲁迅</a> <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 1.1em; color: #999">微服务</a> <a href="/tags/vscode%E6%8F%92%E4%BB%B6/" style="font-size: 1.1em; color: #999">vscode插件</a> <a href="/tags/%E6%96%87%E4%BB%B6%E5%90%8E%E7%BC%80%E9%AB%98%E4%BA%AE/" style="font-size: 1.1em; color: #999">文件后缀高亮</a> <a href="/tags/bug/" style="font-size: 1.1em; color: #999">bug</a> <a href="/tags/%E5%BF%83%E6%83%85/" style="font-size: 1.1em; color: #999">心情</a> <a href="/tags/%E5%AD%A4%E7%8B%AC/" style="font-size: 1.1em; color: #999">孤独</a> <a href="/tags/%E7%B3%BB%E7%BB%9F/" style="font-size: 1.1em; color: #999">系统</a> <a href="/tags/%E9%A1%B9%E7%9B%AE%E5%BB%BA%E8%AE%AE/" style="font-size: 1.1em; color: #999">项目建议</a> <a href="/tags/SpringCloud/" style="font-size: 1.1em; color: #999">SpringCloud</a> <a href="/tags/%E8%87%AA%E6%88%91/" style="font-size: 1.1em; color: #999">自我</a> <a href="/tags/%E6%AF%8D%E4%BA%B2/" style="font-size: 1.1em; color: #999">母亲</a> <a href="/tags/%E5%86%85%E5%BF%83%E7%8B%AC%E7%99%BD/" style="font-size: 1.5em; color: #99a9bf">内心独白</a> <a href="/tags/%E6%B5%8B%E8%AF%84/" style="font-size: 1.1em; color: #999">测评</a> <a href="/tags/%E8%87%AA%E6%88%91%E4%BB%8B%E7%BB%8D/" style="font-size: 1.1em; color: #999">自我介绍</a> <a href="/tags/Rabbit/" style="font-size: 1.1em; color: #999">Rabbit</a></div></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>Archives</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/08/"><span class="card-archive-list-date">八月 2023</span><span class="card-archive-list-count">4</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/07/"><span class="card-archive-list-date">七月 2023</span><span class="card-archive-list-count">5</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/08/"><span class="card-archive-list-date">八月 2021</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/07/"><span class="card-archive-list-date">七月 2021</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/06/"><span class="card-archive-list-date">六月 2021</span><span class="card-archive-list-count">5</span></a></li></ul></div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article :</div><div class="item-count">16</div></div><div class="webinfo-item"><div class="item-name">Run time :</div><div class="item-count" id="runtimeshow" data-publishDate="2023-08-08T15:26:16.522Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Total Count :</div><div class="item-count">11.6k</div></div><div class="webinfo-item"><div class="item-name">UV :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">PV :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Push :</div><div class="item-count" id="last-push-date" data-lastPushDate="2023-08-08T15:26:16.542Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/picture/1.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By 柴祥</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Hi, welcome to my blog</a>!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="Chat"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script>window.addEventListener('load', () => {
+            </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/%E8%87%AA%E6%88%91%E4%BB%8B%E7%BB%8D/" style="font-size: 1.1em; color: #999">自我介绍</a> <a href="/tags/%E5%86%85%E5%BF%83%E7%8B%AC%E7%99%BD/" style="font-size: 1.5em; color: #99a9bf">内心独白</a> <a href="/tags/%E9%A1%B9%E7%9B%AE%E5%BB%BA%E8%AE%AE/" style="font-size: 1.1em; color: #999">项目建议</a> <a href="/tags/%E9%B2%81%E8%BF%85/" style="font-size: 1.1em; color: #999">鲁迅</a> <a href="/tags/%E6%96%87%E5%AD%A6/" style="font-size: 1.1em; color: #999">文学</a> <a href="/tags/%E8%AF%BB%E5%90%8E%E6%84%9F/" style="font-size: 1.1em; color: #999">读后感</a> <a href="/tags/%E6%AF%8D%E4%BA%B2/" style="font-size: 1.1em; color: #999">母亲</a> <a href="/tags/%E8%87%AA%E6%88%91/" style="font-size: 1.1em; color: #999">自我</a> <a href="/tags/%E5%AD%A4%E7%8B%AC/" style="font-size: 1.1em; color: #999">孤独</a> <a href="/tags/vscode%E6%8F%92%E4%BB%B6/" style="font-size: 1.1em; color: #999">vscode插件</a> <a href="/tags/%E6%96%87%E4%BB%B6%E5%90%8E%E7%BC%80%E9%AB%98%E4%BA%AE/" style="font-size: 1.1em; color: #999">文件后缀高亮</a> <a href="/tags/SpringCloud/" style="font-size: 1.1em; color: #999">SpringCloud</a> <a href="/tags/%E6%B5%8B%E8%AF%84/" style="font-size: 1.1em; color: #999">测评</a> <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 1.1em; color: #999">微服务</a> <a href="/tags/%E7%B3%BB%E7%BB%9F/" style="font-size: 1.1em; color: #999">系统</a> <a href="/tags/Rabbit/" style="font-size: 1.1em; color: #999">Rabbit</a> <a href="/tags/%E5%BF%83%E6%83%85/" style="font-size: 1.1em; color: #999">心情</a> <a href="/tags/%E5%86%85%E5%BF%83/" style="font-size: 1.1em; color: #999">内心</a> <a href="/tags/bug/" style="font-size: 1.1em; color: #999">bug</a></div></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>Archives</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/08/"><span class="card-archive-list-date">八月 2023</span><span class="card-archive-list-count">4</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/07/"><span class="card-archive-list-date">七月 2023</span><span class="card-archive-list-count">5</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/08/"><span class="card-archive-list-date">八月 2021</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/07/"><span class="card-archive-list-date">七月 2021</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/06/"><span class="card-archive-list-date">六月 2021</span><span class="card-archive-list-count">5</span></a></li></ul></div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article :</div><div class="item-count">16</div></div><div class="webinfo-item"><div class="item-name">Run time :</div><div class="item-count" id="runtimeshow" data-publishDate="2023-08-09T15:10:26.550Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Total Count :</div><div class="item-count">13k</div></div><div class="webinfo-item"><div class="item-name">UV :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">PV :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Push :</div><div class="item-count" id="last-push-date" data-lastPushDate="2023-08-09T15:10:26.570Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/picture/1.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By 柴祥</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Hi, welcome to my blog</a>!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="Chat"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script>window.addEventListener('load', () => {
   const changeContent = (content) => {
     if (content === '') return content
 
