@@ -1,5 +1,5 @@
 
-[提交 · dev-nop · 系统研发部(System Development Division) / android10镜像 · GitLab (ntimespace.com)](http://gitlab.ntimespace.com/sdd/android10/-/commits/dev-nop/)
+android10镜像 (http://gitlab.ntimespace.com/sdd/android10/-/commits/dev-nop/)
 
 ### first commit[755ed66e](http://gitlab.ntimespace.com/sdd/android10/-/commit/755ed66e8738a441b0dcfa5bc995d3b7db2669d2)
 
