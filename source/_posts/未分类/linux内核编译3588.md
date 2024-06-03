@@ -5,7 +5,6 @@
 - /data/ubuntu/LubanCat_Linux_rk3588_SDK_20230913/kernel .config
 - make menuconfig
 
-
 kernael/.config
 make config
 最终 dd写进去
@@ -17,3 +16,5 @@ lunch 2
 4. /  搜索
 5. 到根目录 ./build.sh lunch 2
    ./build.sh
+
+dd if=./boot.img of=/dev/disk/by-partlabel/boot
