@@ -11,7 +11,6 @@
 * [蓝牙  |  Android 开源项目  |  Android Open Source Project](https://source.android.com/docs/core/bluetooth?hl=zh-cn)
 * [android.bluetooth  |  Android Developers](https://developer.android.com/reference/android/bluetooth/package-summary)
 
-
 frameworks/base/core/java/com/android/internal/space/api/BluetoothMock.java
 
 在AOSP中，蓝牙相关的代码和接口主要位于 `system/bt`目录下[^1^](https://source.android.google.cn/docs/core/connect/bluetooth/services?hl=zh-cn)[。这个目录包含了实现Android蓝牙功能的所有源代码](https://source.android.google.cn/docs/core/connect/bluetooth/services?hl=zh-cn)[^1^](https://source.android.google.cn/docs/core/connect/bluetooth/services?hl=zh-cn)。
@@ -79,13 +78,9 @@ Copilot
 4. **释放读锁** ：最后，无论是否成功获取了扫描模式，函数都会释放读锁。
 5. **返回扫描模式** ：如果函数能够成功获取扫描模式，那么它就会返回这个扫描模式。否则，它会返回 `SCAN_MODE_NONE`。
 
-
 frameworks/base/core/java/android/bluetooth/BluetoothAdapter.java
 
 frameworks/base/core/java/android/bluetooth/BluetoothInputStream.java
-
-
-
 
     这个枚举类型包含了7个值，分别对应蓝牙适配器的7种状态：
 
@@ -98,8 +93,6 @@ frameworks/base/core/java/android/bluetooth/BluetoothInputStream.java
 7. **STATE_BLE_TURNING_OFF** ：这个状态表示低功耗蓝牙正在关闭。
 
 这些状态可以帮助应用程序了解蓝牙适配器的当前状态，从而做出相应的操作。希望这些信息对你有所帮助！
-
-
 
 1. **`SCAN_MODE_NONE`** ：
 
@@ -117,3 +110,188 @@ frameworks/base/core/java/android/bluetooth/BluetoothInputStream.java
 * **用途** ：用于设备希望被新的设备发现并建立连接的场景。比如，在初次配对或设备配对模式下，设备通常处于这种模式，使其能够被其他设备扫描到并请求连接。
 
 ![1715854712501](image/bluetooth/1715854712501.png)
+
+---
+
+frameworks/base/core/java/android/bluetooth
+
+packages/apps/Bluetooth
+
+hardware/interfaces/bluetooth
+
+hardware/qcom/bt
+
+hardware/libhardware/include/hardware/bluetooth.h
+
+---
+
+system/bt/osi/src/alarm.cc
+
+system/bt/btif/src/btif_config.cc
+
+system/bt/binder/android/bluetooth/IBluetoothManager.aidl
+
+frameworks/base/services/core/java/com/android/server/BluetoothService.java
+
+frameworks/base/services/core/java/com/android/server/BluetoothManagerService.java
+
+IBluetoothManager managerService
+
+IBluetoothmService mService
+
+    [在Android的蓝牙模块中，`IBluetoothManager`和 `IBluetooth`是两个重要的接口](https://blog.csdn.net/DamonMasty/article/details/130596792)[^1^](https://blog.csdn.net/DamonMasty/article/details/130596792)[。他们在 `/frameworks/base/core/java/android/bluetooth/`路径下定义](https://blog.csdn.net/DamonMasty/article/details/130596792)[^1^](https://blog.csdn.net/DamonMasty/article/details/130596792)。
+
+* [`IBluetoothManager`：这是一个AIDL接口，它在获取 `BluetoothAdapter`的过程中作为AIDL的客户端初始化](https://blog.csdn.net/DamonMasty/article/details/130596792)[^1^](https://blog.csdn.net/DamonMasty/article/details/130596792)[。它负责接收其他模块的蓝牙交互请求，大部分能力来自 `IBluetooth.aidl`](https://blog.csdn.net/DamonMasty/article/details/130596792)[^1^](https://blog.csdn.net/DamonMasty/article/details/130596792)[。在 `BluetoothAdapter.java`中，通过获取挂在系统服务里的 `BluetoothManagerService`的 `IBinder`服务，然后 `asInterface`成客户端](https://blog.csdn.net/DamonMasty/article/details/130596792)[^1^](https://blog.csdn.net/DamonMasty/article/details/130596792)[。`BluetoothManagerService`在蓝牙系统服务引导过程中被运行起来，作为 `IBinder`服务端初始化并被系统服务集统一管理起来](https://blog.csdn.net/DamonMasty/article/details/130596792)[^1^](https://blog.csdn.net/DamonMasty/article/details/130596792)。
+* [`IBluetooth`：这也是一个AIDL接口，它主要用于控制蓝牙模块，例如开启扫描/停止扫描，设置蓝牙模块对外名称，操纵远程蓝牙设备，例如向远程设备发起配对过程](https://blog.csdn.net/DamonMasty/article/details/130596792)[^1^](https://blog.csdn.net/DamonMasty/article/details/130596792)[。在 `BluetoothAdapter.java`中，`mService`是链接 `bluetooth.apk`的服务](https://blog.csdn.net/DamonMasty/article/details/130596792)[^2^](https://blog.csdn.net/yudelian/article/details/126247233)[。`BluetoothAdapter`与 `BluetoothManagerService.java`建立联系，注册回调](https://blog.csdn.net/DamonMasty/article/details/130596792)[^2^](https://blog.csdn.net/yudelian/article/details/126247233)。
+
+总的来说，`IBluetoothManager`主要负责管理蓝牙服务，而 `IBluetooth`则主要负责执行具体的蓝牙操作。希望这个解释对你有所帮助！
+
+`IBluetooth`接口与蓝牙堆栈直接交互。它提供了一组方法，这些方法允许应用程序执行各种蓝牙操作，如扫描、配对和连接设备等。这些操作会直接与底层的蓝牙堆栈交互来执行。因此，我们可以说 `IBluetooth`是应用程序和蓝牙堆栈之间的桥梁。希望这个解释对你有所帮助！
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+在AOSP中，从Framework层禁用蓝牙模块可以通过修改代码和配置来实现。以下是禁用蓝牙模块的一些方法：
+
+### 方法一：修改配置文件
+
+1. **修改 `frameworks/base` 目录下的配置文件**：
+
+   - 打开 `frameworks/base/core/res/res/values/config.xml` 文件。
+   - 查找 `config_bluetooth_enabled` 属性，将其值设置为 `false`。
+
+     ```xml
+     <!-- Enable or disable Bluetooth -->
+     <bool name="config_bluetooth_enabled">false</bool>
+     ```
+2. **修改 `device/<vendor>/<device>` 目录下的 `BoardConfig.mk` 文件**：
+
+   - 添加或修改以下行以禁用蓝牙：
+
+     ```makefile
+     BOARD_HAVE_BLUETOOTH := false
+     ```
+
+### 方法二：修改蓝牙服务的启动
+
+1. **修改 `frameworks/base/services/java/com/android/server/SystemServer.java`**：
+
+   - 查找并注释掉与蓝牙服务相关的代码：
+
+     ```java
+     import com.android.server.BluetoothManagerService; // 注释掉这一行
+
+     // 注释掉与启动蓝牙服务相关的代码
+     if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
+         // mSystemServiceManager.startService(BluetoothManagerService.Lifecycle.class);
+     }
+     ```
+2. **修改 `frameworks/base/packages/SettingsProvider/res/values/defaults.xml` 文件**：
+
+   - 找到 `bluetooth_on` 属性，将其值设置为 `0`。
+
+     ```xml
+     <!-- Default value for whether Bluetooth is on or off -->
+     <integer name="bluetooth_on">0</integer>
+     ```
+
+### 方法三：修改蓝牙相关的Manifest文件
+
+1. **修改 `frameworks/base/core/res/AndroidManifest.xml`**：
+   - 查找并注释掉或删除与蓝牙相关的 `uses-feature` 和 `uses-permission` 标签。
+
+     ```xml
+     <!-- 注释掉与蓝牙相关的 uses-feature 标签 -->
+     <!-- <uses-feature android:name="android.hardware.bluetooth" android:required="false" /> -->
+     <!-- <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" /> -->
+
+     <!-- 注释掉与蓝牙相关的 uses-permission 标签 -->
+     <!-- <uses-permission android:name="android.permission.BLUETOOTH" /> -->
+     <!-- <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> -->
+     ```
+
+### 方法四：禁用蓝牙HAL
+
+1. **修改 `device/<vendor>/<device>/bluetooth` 目录下的 `bluetooth.mk` 文件**：
+   - 注释掉或删除加载蓝牙HAL模块的代码。
+
+     ```makefile
+     # Comment out or remove the following lines
+     # PRODUCT_PACKAGES += \
+     #     android.hardware.bluetooth@1.0-service
+     ```
+
+### 方法五：从编译中移除蓝牙
+
+1. **修改 `device/<vendor>/<device>/device.mk` 文件**：
+   - 删除与蓝牙相关的模块。
+
+     ```makefile
+     # Comment out or remove the following lines
+     # PRODUCT_PACKAGES += \
+     #     Bluetooth \
+     #     BluetoothExt
+     ```
+
+通过以上方法，可以在AOSP中禁用蓝牙模块。如果需要进一步禁用或定制蓝牙功能，可以根据项目需求进行更深入的修改。
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+
+
+
+在AOSP的构建过程中，`PRODUCT_PACKAGES` 列表中包含了很多默认构建的包，其中一些可能与蓝牙有关。让我们逐一分析你提供的这些包是否与蓝牙相关，以及是否需要删除它们以禁用蓝牙功能：
+
+1. **audio.a2dp.default**:
+
+   - 这个包是默认的A2DP（高级音频分配协议）音频HAL（硬件抽象层）实现，主要用于通过蓝牙传输音频。
+   - **与蓝牙有关，需要删除。**
+2. **audio.usb.default**:
+
+   - 这个包是默认的USB音频HAL实现，主要用于通过USB传输音频。
+   - **与蓝牙无关，不需要删除。**
+3. **audio.r_submix.default**:
+
+   - 这个包是默认的远程子混音（Remote Submix）音频HAL实现，主要用于远程音频流。
+   - **与蓝牙无关，不需要删除。**
+4. **tinyplay**:
+
+   - 这个工具是一个简单的音频播放工具，用于播放音频文件。
+   - **与蓝牙无关，不需要删除。**
+
+因此，要禁用蓝牙功能，您需要从 `PRODUCT_PACKAGES` 列表中删除 `audio.a2dp.default` 包。
+
+修改后的配置如下：
+
+```makefile
+# Build default audio HALs
+PRODUCT_PACKAGES += audio.usb.default \
+		    audio.r_submix.default \
+		    tinyplay
+```
+
+### 总结
+
+删除 `audio.a2dp.default` 可以帮助禁用蓝牙A2DP功能，进一步确保蓝牙模块被禁用。之后，重新编译并刷入设备以验证更改。

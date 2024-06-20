@@ -1,11 +1,8 @@
 ```
-$(warning " LOCALPATH is $(LOCAL_PATH)")
+$(warning " LOCALPATH is $(LOCAL_PATH)   ")
 ```
 
-
-
 grep -rnw 'camera.rk30board'  .
-
 
 [Android .mk文件语法规范-阿里云开发者社区 (aliyun.com)](https://developer.aliyun.com/article/663534)
 
