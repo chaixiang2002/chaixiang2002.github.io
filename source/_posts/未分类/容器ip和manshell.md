@@ -64,3 +64,9 @@ cd /userdata/snow/manage-shell
   561  ./android_ctl.sh restart 0 --image=latest
   562  docker exec -it android_0 /system/bin/sh
   563  history
+
+
+
+./android_ctl.sh start 0 --mac=7c:2a:14:3b:35:da --ip=192.168.30.35 --cpu=0 --gpu=0 --ram=0 --rom=0 --imei=863935410512281 --androidId=46af8b6feb561edc --serialNo=01MM0Q99SUN9 --wifiMac=04:6d:1c:01:12:9d --brand=Google --model=Pixel 2 --gateway=192.168.30.1 --subnet=192.168.30.0/24 --instanceId=92870289188257794
+
+--image=latest
