@@ -1,0 +1,1 @@
+看下reset gpu能不能恢复？echo 1 > /sys/kernel/debug/mali0/reset
