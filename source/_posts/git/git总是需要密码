@@ -1,0 +1,134 @@
+为什么gitlab上传的sshkey，每次pull 还有输入用户名和密码？
+
+在 GitLab 中配置 SSH 密钥后，如果每次 `git pull` 仍然要求输入用户名和密码，可能是因为以下原因：
+
+1. **远程仓库 URL 使用的是 HTTPS 而不是 SSH**：当你添加远程仓库时，如果 URL 是以 `https://` 开头的，那么 Git 会使用 HTTPS 而不是 SSH。因此，即使你已经配置了 SSH 密钥，它也不会生效。你可以检查并更改远程仓库的 URL 来解决这个问题。  
+   - 检查当前远程仓库 URL:
+     ```bash
+     git remote -v
+     ```
+   - 如果看到的是 `https://`，可以将其更改为 SSH URL：
+     ```bash
+     git remote set-url origin git@gitlab.com:username/repository.git
+     ```
+   - 其中 `username/repository.git` 是你自己的仓库路径。
+
+2. **SSH Key 未正确添加到 GitLab**：确保你已将正确的公钥 (`~/.ssh/id_rsa.pub`) 添加到 GitLab 的 SSH Key 设置中。如果公钥没有正确添加，GitLab 无法识别你的身份。
+   
+- 在 GitLab 中，进入 `Preferences` -> `SSH Keys`，然后确保你的公钥正确无误地粘贴到了那里。
+   
+3. **SSH Agent 没有运行或没有加载 SSH Key**：如果你没有在 SSH agent 中添加私钥，Git 无法使用它进行身份验证。你可以通过以下命令添加你的 SSH 私钥到 SSH agent：
+   ```bash
+   eval "$(ssh-agent -s)"
+   ssh-add ~/.ssh/id_rsa
+   ```
+   这将启动 SSH agent 并添加你的 SSH 私钥。
+
+4. **SSH 配置文件设置不正确**：检查你的 SSH 配置文件 (`~/.ssh/config`) 是否正确配置了 GitLab 的设置。如果没有配置，可以添加类似如下的配置：
+   ```
+   Host gitlab.com
+       HostName gitlab.com
+       User git
+       IdentityFile ~/.ssh/id_rsa
+   ```
+
+你可以先检查这些问题，确保 SSH 密钥配置正确后，再尝试 `git pull`。
+
+
+
+
+
+
+
+
+
+
+
+### 原因分析
+
+aosp10二次开发出现一个问题 编译出来的镜像刷机后第一次开机，无论下载什么照片，图库都显示有这张图片，但是打开是灰色的，但是以后的开机就都不会出现这些问题。 第一次开机后打开图库查看照片报错信息如下： 09-17 23:57:31.944  9904  9904 V StateManager: startStateForResult class com.android.gallery3d.app.FilmstripPage, 2 09-17 23:57:31.964  9904  9904 D TileImageView: TileImageView sTileSize=512 09-17 23:57:31.981   307   762 W cam     : hasSystemFeature(String name, int version)---android.hardware.touchscreen 09-17 23:57:31.999   307   762 W cam     : hasSystemFeature(String name, int version)---android.hardware.type.automotive 09-17 23:57:32.042  9904  9984 W DecodeUtils:  09-17 23:57:32.042  9904  9984 W DecodeUtils: java.io.FileNotFoundException: /storage/emulated/0/Pictures/1.png: open failed: ENOENT (No such file or directory) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at libcore.io.IoBridge.open(IoBridge.java:496) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at java.io.FileInputStream.<init>(FileInputStream.java:159) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at java.io.FileInputStream.<init>(FileInputStream.java:115) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at com.android.gallery3d.data.DecodeUtils.decodeThumbnail(DecodeUtils.java:103) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at com.android.gallery3d.data.LocalImage$LocalImageRequest.onDecodeOriginal(LocalImage.java:227) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at com.android.gallery3d.data.ImageCacheRequest.run(ImageCacheRequest.java:81) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at com.android.gallery3d.data.LocalImage$LocalImageRequest.run(LocalImage.java:187) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at com.android.gallery3d.data.ImageCacheRequest.run(ImageCacheRequest.java:28) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at com.android.gallery3d.app.PhotoDataAdapter$ScreenNailJob.run(PhotoDataAdapter.java:732) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at com.android.gallery3d.app.PhotoDataAdapter$ScreenNailJob.run(PhotoDataAdapter.java:708) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at com.android.gallery3d.util.ThreadPool$Worker.run(ThreadPool.java:134) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1167) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at java.lang.Thread.run(Thread.java:919) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at com.android.gallery3d.util.PriorityThreadFactory$1.run(PriorityThreadFactory.java:44) 09-17 23:57:32.042  9904  9984 W DecodeUtils: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at libcore.io.Linux.open(Native Method) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at libcore.io.ForwardingOs.open(ForwardingOs.java:167) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at libcore.io.BlockGuardOs.open(BlockGuardOs.java:252) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at libcore.io.ForwardingOs.open(ForwardingOs.java:167) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at android.app.ActivityThread$AndroidOs.open(ActivityThread.java:7337) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   at libcore.io.IoBridge.open(IoBridge.java:482) 09-17 23:57:32.042  9904  9984 W DecodeUtils:   ... 14 more 09-17 23:57:32.042  9904  9984 W ImageCacheRequest: decode orig failed /local/image/item/15,1726631688,THUMB 09-17 23:57:32.056   307   762 W cam     : hasSystemFeature(String name, int version)---android.hardware.touchscreen 09-17 23:57:32.058  9904  9927 I GLRootView: layout content pane 720x1232 (compensation 0)  我发现把frameworks/base/services/core/java/com/android/server/StorageManagerService.java的private int getMountModeInternal(int uid, String packageName) {        try {            // Get some easy cases out of the way first            if (Process.isIsolated(uid)) {                return Zygote.MOUNT_EXTERNAL_NONE;            }             final String[] packagesForUid = mIPackageManager.getPackagesForUid(uid);            if (ArrayUtils.isEmpty(packagesForUid)) {                // It's possible the package got uninstalled already, so just ignore.                return Zygote.MOUNT_EXTERNAL_NONE;            }            if (packageName == null) {                packageName = packagesForUid[0];            }             if (mPmInternal.isInstantApp(packageName, UserHandle.getUserId(uid))) {                return Zygote.MOUNT_EXTERNAL_NONE;            }             // Determine if caller is holding runtime permission            final boolean hasRead = StorageManager.checkPermissionAndCheckOp(mContext, false, 0,                    uid, packageName, READ_EXTERNAL_STORAGE, OP_READ_EXTERNAL_STORAGE);            final boolean hasWrite = StorageManager.checkPermissionAndCheckOp(mContext, false, 0,                    uid, packageName, WRITE_EXTERNAL_STORAGE, OP_WRITE_EXTERNAL_STORAGE);             // We're only willing to give out broad access if they also hold            // runtime permission; this is a firm CDD requirement            final boolean hasFull = mIPackageManager.checkUidPermission(WRITE_MEDIA_STORAGE,                    uid) == PERMISSION_GRANTED;            if (hasFull && hasWrite) {                return Zygote.MOUNT_EXTERNAL_WRITE;            }             // We're only willing to give out installer access if they also hold            // runtime permission; this is a firm CDD requirement            final boolean hasInstall = mIPackageManager.checkUidPermission(INSTALL_PACKAGES,                    uid) == PERMISSION_GRANTED;            boolean hasInstallOp = false;            // OP_REQUEST_INSTALL_PACKAGES is granted/denied per package but vold can't            // update mountpoints of a specific package. So, check the appop for all packages            // sharing the uid and allow same level of storage access for all packages even if            // one of the packages has the appop granted.            for (String uidPackageName : packagesForUid) {                if (mIAppOpsService.checkOperation(                        OP_REQUEST_INSTALL_PACKAGES, uid, uidPackageName) == MODE_ALLOWED) {                    hasInstallOp = true;                    break;                }            }            if ((hasInstall || hasInstallOp) && hasWrite) {                return Zygote.MOUNT_EXTERNAL_WRITE;            }             // Otherwise we're willing to give out sandboxed or non-sandboxed if            // they hold the runtime permission            final boolean hasLegacy = mIAppOpsService.checkOperation(OP_LEGACY_STORAGE,                    uid, packageName) == MODE_ALLOWED;            if (hasLegacy && hasWrite) {                return Zygote.MOUNT_EXTERNAL_WRITE;            } else if (hasLegacy && hasRead) {                return Zygote.MOUNT_EXTERNAL_READ;            } else {                return Zygote.MOUNT_EXTERNAL_DEFAULT;            }        } catch (RemoteException e) {            // Should not happen        }        return Zygote.MOUNT_EXTERNAL_NONE;    }  其中的            if (hasFull && hasWrite) {                return Zygote.MOUNT_EXTERNAL_FULL;            } 修改成            if (hasFull && hasWrite) {                return Zygote.MOUNT_EXTERNAL_WRITE;            }  这样以后，这个问题就成功解决了 我百思不得其解，为什么把权限缩小，反而不会报找不到文件的错误呢？
+
+
+
+这个问题很可能与 AOSP 10 中存储权限和访问机制的改变有关。Android 10 引入了**分区存储**（Scoped Storage），它改变了应用程序对外部存储的访问方式。具体来说，Android 10 更严格地限制了应用程序对设备存储的直接访问，以提高用户的隐私和数据安全。
+
+### 问题的原因
+在 `StorageManagerService.java` 中，`Zygote.MOUNT_EXTERNAL_FULL` 和 `Zygote.MOUNT_EXTERNAL_WRITE` 表示了不同的存储挂载模式：
+- **`MOUNT_EXTERNAL_FULL`**：授予应用程序对外部存储的完全访问权限，包括对其他应用程序文件的访问。这种模式允许访问外部存储的根目录。
+- **`MOUNT_EXTERNAL_WRITE`**：仅允许对应用程序特定目录的写入权限（例如，`/storage/emulated/0/Android/data/<package_name>/`），而无法访问其他应用程序的数据或外部存储的根目录。
+
+### 原因分析
+1. **首次开机特殊环境**：在 Android 系统首次开机时，文件系统和权限可能还未完全准备好。此时，授予 `MOUNT_EXTERNAL_FULL` 权限可能导致一些文件无法正确挂载或索引，尤其是在首次开机后图库扫描系统存储时。如果某些文件路径或目录未准备好，`FileNotFoundException` 错误就会发生。
+
+2. **分区存储的影响**：在 Android 10 中，如果应用程序请求了 `MOUNT_EXTERNAL_FULL` 权限，但文件系统并未准备好或应用未正确声明分区存储的使用，系统可能无法正确索引或访问某些目录，导致文件找不到。
+
+3. **权限缩小的结果**：将权限缩小到 `MOUNT_EXTERNAL_WRITE`，应用程序仅能访问自己应用程序的存储区域，这样可以避免在首次开机时，尝试访问整个外部存储时遇到的问题。由于应用程序的访问范围变小，因此减少了出错的机会。
+
+### 为什么修改后问题解决了
+- **减少了访问范围**：将权限限制为 `MOUNT_EXTERNAL_WRITE` 后，系统不再尝试让应用程序访问整个外部存储，只访问应用程序自己的数据目录，这避免了首次开机时系统未完全准备好时引发的问题。
+- **分区存储兼容**：`MOUNT_EXTERNAL_WRITE` 模式与 Android 10 的分区存储模型更兼容，减少了权限错误和访问失败的可能性。
+
+综上所述，缩小权限反而解决问题，是因为避免了首次开机时尝试访问整个外部存储时可能发生的错误，并且与分区存储模型更加兼容。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+做了这个修改之后，影响范围主要在于应用程序对外部存储的访问权限。由于修改的代码涉及系统如何授予应用程序外部存储的权限，因此可能会影响以下方面：
+
+### 影响范围
+1. **应用程序的存储访问**：
+   - 如果某些系统应用或第三方应用依赖 `MOUNT_EXTERNAL_FULL` 权限以访问整个外部存储，而不仅仅是自己的特定目录，这些应用可能会受到限制，无法访问其他应用的数据或公共目录。
+   
+2. **文件管理器和多媒体应用**：
+   - 文件管理器类的应用和多媒体应用（例如，图库、音乐播放器）可能需要访问外部存储的更多部分。如果它们以前依赖 `MOUNT_EXTERNAL_FULL` 权限，现在可能只能访问自己应用的目录，这可能影响它们的功能。
+
+3. **安装和数据迁移**：
+   - 修改可能会影响应用程序的安装、数据备份和恢复流程，特别是如果它们涉及对外部存储的大范围访问。
+
+4. **权限相关的异常处理**：
+   - 任何涉及外部存储权限的错误处理逻辑都可能需要更新，以适应新的权限级别。
+
+### 测试应该检测哪些地方
+为了确保这个修改不会引入新的问题，建议进行以下测试：
+
+1. **应用程序功能测试**：
+   - 测试受影响的系统应用（如图库、文件管理器）以及常用的第三方应用，确保它们在修改后仍能正常读取和写入数据。
+   - 确保应用在尝试访问外部存储时没有出现权限相关的崩溃或异常。
+
+2. **存储访问权限测试**：
+   - 测试不同应用在修改后的权限下能否正常读取和写入其数据目录（`/storage/emulated/0/Android/data/<package_name>/`）。
+   - 确保系统不会将外部存储的敏感区域错误地暴露给应用。
+
+3. **首次开机和重启测试**：
+   - 仿真首次开机和设备重启，检查系统媒体扫描和索引过程，确保图库、音乐等应用可以正确识别和显示存储中的文件。
+   - 确保修改不会导致其他应用在首次开机或重启后出现文件找不到的错误。
+
+4. **文件管理和多媒体操作**：
+   - 测试文件管理器的复制、移动、删除操作，以及多媒体应用（如图库、音乐播放器）的文件扫描和播放功能，确保它们的功能没有受到限制。
+   
+5. **数据备份和恢复**：
+   - 测试系统自带的备份和恢复功能，确保在修改后仍能正确备份和恢复应用数据，包括外部存储中的文件。
+
+6. **权限回退测试**：
+   - 检查应用是否处理了权限不足的情况，确保在无法获取外部存储权限时不会崩溃，并能给出适当的错误提示。
+
+### 风险控制
+- **灰度测试**：可以先在一部分设备上进行灰度测试，观察实际使用中是否出现异常，再决定是否全面推送。
+- **回滚准备**：准备好回滚策略，以防万一修改上线后出现严重问题，可以及时恢复到之前的状态。
+
+通过全面的测试，确保应用和系统功能在这个修改后的环境中正常运行，可以降低上线出问题的风险。
