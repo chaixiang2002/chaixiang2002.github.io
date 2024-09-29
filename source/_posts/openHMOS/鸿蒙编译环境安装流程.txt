@@ -1,0 +1,115 @@
+# OrangePi 5B OpenHarmony 安装指南
+
+## 1. 安装依赖工具
+
+在Ubuntu 18.04上运行以下命令安装必要的依赖:
+
+```bash
+sudo apt-get update && sudo apt-get install binutils git git-lfs gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev ccache libgl1-mesa-dev libxml2-utils xsltproc unzip m4 bc gnutls-bin python3.8 python3-pip ruby
+```
+
+注意:其他Ubuntu版本可能需要调整包名。
+
+## 2. 获取源码
+
+### 前提条件
+
+1. 注册Gitee账号
+2. 配置SSH公钥
+3. 安装和配置Git:
+   ```bash
+   git config --global user.name "yourname"
+   git config --global user.email "your-email-address"
+   git config --global credential.helper store
+   ```
+4. 安装Repo工具:
+   ```bash
+   curl -s https://gitee.com/oschina/repo/raw/fork_flow/repo-py3 > /usr/local/bin/repo
+   chmod a+x /usr/local/bin/repo
+   pip3 install -i https://repo.huaweicloud.com/repository/pypi/simple requests
+   ```
+
+# 或者你可以将repo下载到当前目录：
+   curl -s https://gitee.com/oschina/repo/raw/fork_flow/repo-py3 > ./repo
+   chmod a+x ./repo
+
+### 下载源码
+
+1. 下载OpenHarmony源码:
+   ```bash
+   repo init -u https://gitee.com/openharmony/manifest.git -b OpenHarmony-4.0-Release --no-repo-verify
+   repo sync -c
+   repo forall -c 'git lfs pull'
+   ```
+   ./repo init -u https://gitee.com/openharmony/manifest.git -b OpenHarmony-4.0-Release --no-repo-verify
+   ./repo sync -c
+   ./repo forall -c 'git lfs pull'
+
+2. 下载OrangePi适配源码:
+   ```bash
+   git clone https://gitee.com/openharmony-dg/device_board_orangepi device/board/orangepi -b OpenHarmony-4.0-Release
+   git clone https://gitee.com/openharmony-dg/vendor_orangepi vendor/orangepi -b OpenHarmony-4.0-Release
+   git clone https://gitee.com/openharmony-dg/device_soc_rockchip -b OpenHarmony-4.0-Release
+   git clone https://gitee.com/openharmony-dg/rockchip_linux_5.10 kernel/linux/linux-5.10_rockchip -b OpenHarmony-4.0-Release
+   ```
+
+3. 替换必要文件:
+   - 将`device_soc_rockchip`仓内容复制到`device/soc/rockchip`目录
+   - 替换`build`目录下的`compile_standard_whitelist.json`文件
+
+## 3. 安装预编译工具
+
+在源码根目录执行:
+sudo bash build/prebuilts_download.sh
+   
+
+## 4. 编译
+
+1. 在源码根目录执行:
+sudo ./build.sh --product-name orangepi_5b --ccache --no-prebuilt-sdk --disable-package-image
+sudo ./build.sh --product-name roc_rk3588s_pc --ccache --no-prebuilt-sdk --disable-package-image
+2. 编译成功后,查看`out/orangepi_5b/packages/phone/images/`目录下的镜像文件
+
+
+根据错误日志，另外所需要的工具安装:
+sudo apt install openjdk-11-jdk
+sudo apt-get install libxt-dev
+sudo apt-get install libx11-dev
+sudo apt install xorg-dev
+sudo apt install libssl-dev
+sudo apt install liblz4-tool
+sudo apt install genext2fs
+sudo apt install default-jdk
+sudo apt install libtinfo5
+sudo apt install u-boot-tools
+sudo apt install mtools
+sudo apt install mtd-utils
+sudo apt install scons
+sudo apt install gcc-arm-none-eabi
+sudo apt install gcc-arm-linux-gnueabi
+
+需要修改跟目录下面的 //drivers/hdf_core/adapter/khdf/linux/osal/src/osal_time.c
+https://gitee.com/openharmony-dg/drivers_hdf_core/blob/OpenHarmony-5.0-Release/adapter/khdf/linux/osal/src/osal_time.c#
+uint64_t OsalGetSysTimeMs(void)
+{
+   OsalTimespec time;
+
+   (void)memset_s(&time, sizeof(time), 0, sizeof(time));
+   (void)OsalGetTime(&time);
+
+    return (time.sec * HDF_KILO_UNIT + OsalDivS64(time.usec, HDF_KILO_UNIT));
+}
+
+错误方法调试：
+
+可以通过反编译的方式定位具体报错堆栈：
+
+1)、拷贝vmlinux文件（./out/kernel/OBJ/linux-5.10/vmlinux） 到 prebuilts/gcc/linux-x86/aarch64/gcc-linaro-7.5.0-2019.12-x86_64-aarch64-linux-gnu/bin中
+
+2)、cd 目录 prebuilts/gcc/linux-x86/aarch64/gcc-linaro-7.5.0-2019.12-x86_64-aarch64-linux-gnu/bin 中，执行./aarch64-linux-gnu-gdb vmlinux 
+
+3)、输入 list *__clk_register+0x60 输出：故障位置  
+
+
+在 out/kernel/src修改配置選項
+sudo make CROSS_COMPILE=/data/panhy/ohos_opi5/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu- ARCH=arm64 menuconfig
