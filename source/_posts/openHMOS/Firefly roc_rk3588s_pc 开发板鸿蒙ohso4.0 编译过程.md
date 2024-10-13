@@ -164,3 +164,6 @@ sudo make CROSS_COMPILE=/data/panhy/ohos_opi5/prebuilts/gcc/linux-x86/aarch64/gc
 ```
 
 然后再将out/kernel/obj下的.config拷贝到ohos_4.0/device/board/firefly/roc_rk3588s_pc/kernel/config/rk3588s_standard_defconfig之中，重新编译
+
+sudo make CROSS_COMPILE=/snow/openHMOS/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu- ARCH=arm64 menuconfig
+

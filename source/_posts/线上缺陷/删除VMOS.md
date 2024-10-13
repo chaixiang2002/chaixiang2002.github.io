@@ -1,0 +1,1 @@
+kill $(ps -ef | grep del-vmos.sh | grep -v grep | awk '{print $2}')
