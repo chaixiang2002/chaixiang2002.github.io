@@ -43,3 +43,9 @@ linux/v5.10.226/source/include/linux/mm.h static inline unsigned long [totalram_
 linux/v5.10.226/source/include/asm-generic/atomic-long.h [atomic_long_read](https://elixir.bootlin.com/linux/v5.10.226/C/ident/atomic_long_read)(const [atomic_long_t](https://elixir.bootlin.com/linux/v5.10.226/C/ident/atomic_long_t) *v)
 
 我开发是，就一句话，然后我自己琢磨，做到一半，他们想到哪个具体的场景就来说，做着着才能明确具体要求，还要我自己反复确认
+
+![lxcfs](https://cdn.jsdelivr.net/gh/chaixiang2002/repo/picgo/img/202410151519973.webp)
+
+# 容器资源视图隔离
+
+[lxcfs 是什么？ lxcfs 实现对容器资源视图隔离的最佳实践容器技术提供了不同于传统虚拟机技术的环境隔离方式。 - 掘金 (juejin.cn)](https://juejin.cn/post/6847902216511356936)
