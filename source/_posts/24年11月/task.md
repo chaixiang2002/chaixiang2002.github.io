@@ -1,0 +1,720 @@
+[Android原理_bjxiaxueliang的博客-CSDN博客](https://blog.csdn.net/xiaxl/category_9285944_2.html)
+
+- 人脸识别
+- 给所有项目开放root和守护进程
+- 通知栏运营商
+
+---
+
+## 可能的文件和方法
+
+frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/OperatorNameView.java
+
+public void onRefreshCarrierInfo()：53
+
+
+
+## frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/OperatorNameView.java详解
+
+`OperatorNameView` 是一个自定义的 `TextView`，其主要功能是显示当前设备的运营商名称。它涉及到多个系统模块，如 `KeyguardUpdateMonitor`、`NetworkController`、`TunerService` 等，下面我们逐行分析它的代码及其功能。
+
+### 1. **类声明**
+
+```java
+public class OperatorNameView extends TextView implements DemoMode, DarkReceiver,
+        SignalCallback, Tunable {
+```
+
+- `OperatorNameView` 继承自 `TextView`，所以它是一个文本视图，用来显示运营商名称。
+- 实现了接口 `DemoMode`、`DarkReceiver`、`SignalCallback` 和 `Tunable`，这些接口提供了不同的回调方法，用来处理演示模式、黑色模式、信号变化以及配置项的变化。
+
+### 2. **成员变量**
+
+```java
+private static final String KEY_SHOW_OPERATOR_NAME = "show_operator_name";
+private KeyguardUpdateMonitor mKeyguardUpdateMonitor;
+private boolean mDemoMode;
+```
+
+- `KEY_SHOW_OPERATOR_NAME`：这是一个常量，表示是否显示运营商名称的配置键。
+- `mKeyguardUpdateMonitor`：这是 `KeyguardUpdateMonitor` 的实例，用于监控 SIM 卡和服务状态，更新屏幕锁定时的运营商信息。
+- `mDemoMode`：一个布尔值，表示是否处于演示模式（Demo Mode）。
+
+### 3. **回调函数**
+
+```java
+private final KeyguardUpdateMonitorCallback mCallback = new KeyguardUpdateMonitorCallback() {
+    @Override
+    public void onRefreshCarrierInfo() {
+        updateText();
+    }
+};
+```
+
+- `mCallback` 是一个 `KeyguardUpdateMonitorCallback` 的实例，主要用于接收运营商信息的更新。每当运营商信息刷新时，回调 `onRefreshCarrierInfo`，调用 `updateText()` 更新运营商名称。
+
+### 4. **构造方法**
+
+```java
+public OperatorNameView(Context context) {
+    this(context, null);
+}
+public OperatorNameView(Context context, AttributeSet attrs) {
+    this(context, attrs, 0);
+}
+public OperatorNameView(Context context, AttributeSet attrs, int defStyle) {
+    super(context, attrs, defStyle);
+}
+```
+
+- 提供了三个构造方法，允许从 XML 布局文件中创建 `OperatorNameView` 对象，并为其设置属性。
+
+### 5. **生命周期方法**
+
+```java
+@Override
+protected void onAttachedToWindow() {
+    super.onAttachedToWindow();
+    mKeyguardUpdateMonitor = KeyguardUpdateMonitor.getInstance(mContext);
+    mKeyguardUpdateMonitor.registerCallback(mCallback);
+    Dependency.get(DarkIconDispatcher.class).addDarkReceiver(this);
+    Dependency.get(NetworkController.class).addCallback(this);
+    Dependency.get(TunerService.class).addTunable(this, KEY_SHOW_OPERATOR_NAME);
+}
+
+@Override
+protected void onDetachedFromWindow() {
+    super.onDetachedFromWindow();
+    mKeyguardUpdateMonitor.removeCallback(mCallback);
+    Dependency.get(DarkIconDispatcher.class).removeDarkReceiver(this);
+    Dependency.get(NetworkController.class).removeCallback(this);
+    Dependency.get(TunerService.class).removeTunable(this);
+}
+```
+
+- **`onAttachedToWindow`**：当视图附加到窗口时，注册了多个回调：
+  - `KeyguardUpdateMonitor`：监听运营商信息的变化。
+  - `DarkIconDispatcher`：监听黑色图标模式的变化。
+  - `NetworkController`：监听网络状态变化。
+  - `TunerService`：监听是否显示运营商名称的配置项变化。
+- **`onDetachedFromWindow`**：当视图从窗口中移除时，取消所有的回调。
+
+### 6. **黑色模式回调**
+
+```java
+@Override
+public void onDarkChanged(Rect area, float darkIntensity, int tint) {
+    setTextColor(DarkIconDispatcher.getTint(area, this, tint));
+}
+```
+
+- `onDarkChanged` 是 `DarkReceiver` 接口中的方法。当系统进入黑色模式时，会回调此方法，更新运营商名称的颜色。
+
+### 7. **信号状态回调**
+
+```java
+@Override
+public void setIsAirplaneMode(IconState icon) {
+    update();
+}
+
+@Override
+public void onTuningChanged(String key, String newValue) {
+    update();
+}
+```
+
+- **`setIsAirplaneMode`**：当飞行模式发生变化时，调用 `update()` 更新运营商显示。
+- **`onTuningChanged`**：当与配置相关的键值变化时，调用 `update()` 更新运营商显示（例如用户通过 `TunerService` 改变了是否显示运营商名称的设置）。
+
+### 8. **演示模式回调**
+
+```java
+@Override
+public void dispatchDemoCommand(String command, Bundle args) {
+    if (!mDemoMode && command.equals(COMMAND_ENTER)) {
+        mDemoMode = true;
+    } else if (mDemoMode && command.equals(COMMAND_EXIT)) {
+        mDemoMode = false;
+        update();
+    } else if (mDemoMode && command.equals(COMMAND_OPERATOR)) {
+        setText(args.getString("name"));
+    }
+}
+```
+
+- `dispatchDemoCommand` 用于处理演示模式的命令。如果进入演示模式（`COMMAND_ENTER`），则设置 `mDemoMode = true`，并在退出演示模式时（`COMMAND_EXIT`）恢复正常。如果在演示模式中收到 `COMMAND_OPERATOR` 命令，则显示传递的运营商名称。
+
+### 9. **更新方法**
+
+```java
+private void update() {
+    boolean showOperatorName = Dependency.get(TunerService.class)
+            .getValue(KEY_SHOW_OPERATOR_NAME, 1) != 0;
+    setVisibility(showOperatorName ? VISIBLE : GONE);
+
+    boolean hasMobile = ConnectivityManager.from(mContext)
+            .isNetworkSupported(ConnectivityManager.TYPE_MOBILE);
+    boolean airplaneMode = WirelessUtils.isAirplaneModeOn(mContext);
+    if (!hasMobile || airplaneMode) {
+        setText(null);
+        setVisibility(GONE);
+        return;
+    }
+
+    if (!mDemoMode) {
+        updateText();
+    }
+}
+```
+
+- **`update()`** 方法控制是否显示运营商名称：
+  - 通过 `TunerService` 获取是否显示运营商名称的设置（`KEY_SHOW_OPERATOR_NAME`）。
+  - 检查设备是否支持移动网络以及是否处于飞行模式。如果不支持移动网络或处于飞行模式，隐藏运营商名称并清空文本。
+  - 如果不是演示模式，则调用 `updateText()` 更新运营商名称。
+
+### 10. **更新运营商名称**
+
+```java
+private void updateText() {
+    CharSequence displayText = null;
+    List<SubscriptionInfo> subs = mKeyguardUpdateMonitor.getFilteredSubscriptionInfo(false);
+    final int N = subs.size();
+    for (int i = 0; i < N; i++) {
+        int subId = subs.get(i).getSubscriptionId();
+        State simState = mKeyguardUpdateMonitor.getSimState(subId);
+        CharSequence carrierName = subs.get(i).getCarrierName();
+        if (!TextUtils.isEmpty(carrierName) && simState == State.READY) {
+            ServiceState ss = mKeyguardUpdateMonitor.getServiceState(subId);
+            if (ss != null && ss.getState() == ServiceState.STATE_IN_SERVICE) {
+                displayText = carrierName;
+                break;
+            }
+        }
+    }
+
+    setText(displayText);
+}
+```
+
+- **`updateText()`** 方法是获取当前 SIM 卡的运营商名称，并更新显示：
+  - 获取所有有效的 `SubscriptionInfo`，并根据 `SIM 卡状态`（是否插卡且正常工作）和 `服务状态`（是否在服务中）来决定是否显示运营商名称。
+  - 如果满足条件，设置文本为运营商名称。
+
+### 总结
+
+`OperatorNameView` 主要负责在状态栏或屏幕锁定界面上显示当前的运营商名称。它根据设备的网络状态（如是否支持移动网络，飞行模式的状态）以及 SIM 卡和服务状态来决定是否显示运营商名称。它还支持演示模式，用于模拟不同的运营商名称显示，且能够响应系统的黑色模式、信号变化等事件。
+
+---
+
+frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/policy/MobileSignalController.java
+
+frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/policy/EmergencyCryptkeeperText.java
+
+-----
+
+## frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/phone/CollapsedStatusBarFragment.java
+
+`CollapsedStatusBarFragment.java` 是 Android 系统中负责处理状态栏折叠部分（Collapsed Status Bar）的 Fragment 类。它负责在状态栏折叠时显示或隐藏各种 UI 元素，包括时钟、通知图标、系统信息、运营商名称等。它还与状态栏的生命周期、系统配置、键盘保护状态（Keyguard）、网络状态等进行交互。
+
+### 主要功能：
+1. **控制状态栏折叠部分的显示和隐藏：**
+   - 该类管理状态栏折叠区域内的多个 UI 元素，如时钟（Clock）、通知图标、系统图标、运营商名称等。它负责根据不同的条件和状态决定是否显示这些元素。
+
+2. **根据禁用标志（Disable Flags）控制状态栏元素：**
+   - `disable()` 方法根据传入的禁用标志来显示或隐藏时钟、系统图标、通知图标和运营商名称。这些禁用标志来自系统或其他组件，例如锁屏状态、网络状态、飞行模式等。
+
+3. **键盘保护和网络状态的处理：**
+   - `onCreate()` 方法中会初始化一些依赖，如 `KeyguardMonitor`（键盘保护状态管理器）和 `NetworkController`（网络状态管理器）。这两个管理器会提供当前的键盘保护状态和网络状态，并影响状态栏的显示。
+
+4. **UI 动画控制：**
+   - 该类使用动画来平滑地显示或隐藏状态栏中的元素。比如，`animateShow()` 和 `animateHide()` 方法分别用来控制元素的显示和隐藏，通过动画来过渡状态。
+
+5. **运营商名称的显示：**
+   - 在 `initOperatorName()` 方法中，根据配置文件（`config_showOperatorNameInStatusBar`）决定是否显示运营商名称。如果启用，则会通过 `ViewStub` 动态加载显示运营商名称的视图。
+
+6. **紧急加密保护文本的初始化：**
+   - `initEmergencyCryptkeeperText()` 用于在设备加密状态下显示紧急文本。它会检查 `NetworkController` 是否有紧急加密文本，如果有，它会显示相应的视图。
+
+### 各个方法的功能：
+
+1. **`onCreate()`**：
+   - 初始化 `KeyguardMonitor`、`NetworkController`、`StatusBarStateController` 等依赖对象。
+
+2. **`onCreateView()`**：
+   - 创建并返回状态栏的根视图（`status_bar`）。
+
+3. **`onViewCreated()`**：
+   - 绑定视图组件，初始化各种视图（如时钟、系统图标区等）并设置显示和隐藏逻辑。还初始化了运营商名称和紧急加密文本的相关设置。
+
+4. **`onSaveInstanceState()`**：
+   - 保存状态栏视图的状态，以便在视图重建时恢复。
+
+5. **`onResume()` 和 `onPause()`**：
+   - 分别注册和注销 `CommandQueue` 和 `StatusBarStateController` 的回调。
+
+6. **`disable()`**：
+   - 根据传入的禁用标志来显示或隐藏状态栏中的元素，如时钟、系统图标、通知图标和运营商名称等。
+
+7. **`adjustDisableFlags()`**：
+   - 根据当前状态（如是否显示加密保护文本、飞行模式、加密状态等）调整禁用标志，确保禁用或显示相应的状态栏元素。
+
+8. **`hideSystemIconArea()`、`showSystemIconArea()`**：
+   - 显示或隐藏系统图标区域。
+
+9. **`hideClock()`、`showClock()`**：
+   - 显示或隐藏时钟。
+
+10. **`hideNotificationIconArea()`、`showNotificationIconArea()`**：
+    - 显示或隐藏通知图标区域。
+
+11. **`hideOperatorName()`、`showOperatorName()`**：
+    - 显示或隐藏运营商名称。
+
+12. **`animateHide()` 和 `animateShow()`**：
+    - 控制视图的动画显示和隐藏，确保 UI 元素在状态变化时具有平滑的过渡效果。
+
+13. **`initOperatorName()`**：
+    - 根据配置文件决定是否需要显示运营商名称。如果需要显示，会通过 `ViewStub` 动态加载显示运营商名称的视图。
+
+14. **`initEmergencyCryptkeeperText()`**：
+    - 根据设备的加密状态，决定是否需要显示紧急加密保护文本。
+
+### 与你的需求的关系：
+
+你提到需要将**运营商名称和时间错开**，这正是 `initOperatorName()` 和状态栏显示/隐藏逻辑的核心之一。具体来说：
+
+- **`initOperatorName()`** 方法负责初始化运营商名称的显示。如果你的需求是避免运营商名称与时间重叠，这个方法中的 `ViewStub` 加载的 `operator_name` 视图可能需要调整布局或动画控制来确保它们不会重叠。
+  
+- **`disable()` 方法** 和 **`adjustDisableFlags()` 方法** 也可能会影响运营商名称和时钟的显示，因为它们处理禁用标志，控制时钟、系统图标、运营商名称的显示与隐藏。
+
+### 如何修改代码来实现需求：
+
+要确保**运营商名称和时间不重叠**，你可以考虑以下几点：
+
+1. **调整布局**：在 `onViewCreated()` 中，初始化 `mOperatorNameFrame` 时，确保它与时钟视图的布局不冲突。例如，你可以通过调整它们的 `margin` 或 `gravity` 来确保它们的显示区域互不干扰。
+
+2. **动态调整显示顺序**：在 `disable()` 方法中，根据当前状态动态调整运营商名称和时钟的显示顺序或者位置。例如，在某些情况下，你可以隐藏其中一个，避免它们同时显示。
+
+3. **动画控制**：通过 `animateShow()` 和 `animateHide()` 方法来控制运营商名称和时钟的显示效果。确保它们之间有平滑的过渡，避免同时显示时造成视觉冲突。
+
+### 总结：
+这个类主要负责管理折叠状态栏的显示和隐藏，包括时钟、运营商名称、通知图标等。如果你需要避免运营商名称和时间重叠，重点关注 `initOperatorName()`、`disable()` 和相关的显示/隐藏逻辑，确保它们的布局和显示状态能够互相错开。
+
+---
+
+### HeadsUpAppearanceController.java
+
+它用于**控制和更新 HeadsUp（紧急通知）显示的外观和布局**。HeadsUp 通知通常出现在状态栏顶部，显示在当前应用和通知之间，类似于一个浮动的通知条。
+
+`setShown(boolean isShown)` 方法位于 `HeadsUpAppearanceController.java` 中，它用于**控制和更新 HeadsUp（紧急通知）显示的外观和布局**。HeadsUp 通知通常出现在状态栏顶部，显示在当前应用和通知之间，类似于一个浮动的通知条。
+
+这个方法的功能可以分解为以下几个步骤：
+
+### 1. **检查 `mShown` 和 `isShown` 的值**
+   ```java
+   if (mShown != isShown) {
+       mShown = isShown;
+   ```
+   - 方法开始时，首先检查当前的显示状态（`mShown`）与传入的状态（`isShown`）是否一致。如果不一致，说明显示状态发生了变化，所以需要进行相应的更新。
+
+### 2. **处理 `isShown` 为 `true` 的情况**
+   如果 `isShown` 为 `true`，则表示 HeadsUp 通知需要显示或已经显示。以下操作会被执行：
+
+   - **更新父布局的剪辑行为：**
+     ```java
+     updateParentClipping(false /* shouldClip */);
+     ```
+     - 调用 `updateParentClipping` 方法并传入 `false`，表明在显示 HeadsUp 时，不需要裁剪父视图的内容。
+     
+   - **显示 HeadsUp 状态栏视图：**
+     ```java
+     mHeadsUpStatusBarView.setVisibility(View.VISIBLE);
+     show(mHeadsUpStatusBarView);
+     ```
+     - 设置 `mHeadsUpStatusBarView` 的可见性为 `VISIBLE`，并通过 `show` 方法显示它。
+     
+   - **隐藏时钟视图：**
+     ```java
+     hide(mClockView, View.INVISIBLE);
+     ```
+     - 将时钟视图 (`mClockView`) 设置为不可见，`View.INVISIBLE` 意味着它仍然占据布局空间，但不可见。
+     
+   - **隐藏居中的图标视图：**
+     ```java
+     if (mCenteredIconView.getVisibility() != View.GONE) {
+         hide(mCenteredIconView, View.INVISIBLE);
+     }
+     ```
+     - 如果居中的图标视图 (`mCenteredIconView`) 没有被完全隐藏 (`View.GONE`)，则将其设置为不可见。
+     
+   - **隐藏运营商名称视图：**
+     ```java
+     if (mOperatorNameView != null) {
+         hide(mOperatorNameView, View.INVISIBLE);
+     }
+     ```
+     - 如果存在运营商名称视图 (`mOperatorNameView`)，则将其设置为不可见。
+     
+### 3. **处理 `isShown` 为 `false` 的情况**
+   如果 `isShown` 为 `false`，表示 HeadsUp 通知被隐藏或已经消失。以下操作会被执行：
+
+   - **显示时钟视图：**
+     ```java
+     show(mClockView);
+     ```
+     - 将时钟视图 (`mClockView`) 显示出来。
+     
+   - **显示居中的图标视图：**
+     ```java
+     if (mCenteredIconView.getVisibility() != View.GONE) {
+         show(mCenteredIconView);
+     }
+     ```
+     - 如果居中的图标视图 (`mCenteredIconView`) 没有被完全隐藏 (`View.GONE`)，则将其显示出来。
+     
+   - **显示运营商名称视图：**
+     ```java
+     if (mOperatorNameView != null) {
+         show(mOperatorNameView);
+     }
+     ```
+     - 如果存在运营商名称视图 (`mOperatorNameView`)，则将其显示出来。
+     
+   - **隐藏 HeadsUp 状态栏视图：**
+     ```java
+     hide(mHeadsUpStatusBarView, View.GONE, () -> {
+         updateParentClipping(true /* shouldClip */);
+     });
+     ```
+     - 将 HeadsUp 状态栏视图 (`mHeadsUpStatusBarView`) 隐藏，并在隐藏后调用回调函数来更新父视图的剪辑行为。
+
+### 4. **更新状态栏禁用标志**
+   ```java
+   if (mStatusBarStateController.getState() != StatusBarState.SHADE) {
+       mCommandQueue.recomputeDisableFlags(
+               mHeadsUpStatusBarView.getContext().getDisplayId(), false);
+   }
+   ```
+   - 如果当前状态栏不在 **Shade**（即通知面板打开的状态），则重新计算状态栏的禁用标志。禁用标志会影响状态栏图标和其他系统视图的显示。
+
+### 总结：
+`setShown` 方法根据传入的 `isShown` 参数来控制 HeadsUp 通知视图的显示与隐藏。当 HeadsUp 被显示时：
+- 隐藏时钟、运营商名称和居中图标等视图。
+- 显示 HeadsUp 通知视图。
+当 HeadsUp 被隐藏时：
+- 恢复显示时钟、运营商名称和居中图标等视图。
+- 隐藏 HeadsUp 通知视图。
+
+### 与你的需求关系：
+如果你的需求是调整屏幕左上角的运营商名称，在这种情况下，`HeadsUpAppearanceController.java` 可能会涉及到**隐藏和显示运营商名称**（`mOperatorNameView`）。当 HeadsUp 通知显示时，运营商名称会被隐藏，当 HeadsUp 隐藏时，运营商名称会重新显示。
+
+如果你需要在 HeadsUp 显示时调整运营商名称的显示方式，或者希望在显示/隐藏 HeadsUp 时更灵活地处理运营商名称的可见性，`setShown` 方法中的相关逻辑（特别是对 `mOperatorNameView` 的隐藏和显示）会是一个关键点。`setShown(boolean isShown)` 方法位于 `HeadsUpAppearanceController.java` 中，它用于**控制和更新 HeadsUp（紧急通知）显示的外观和布局**。HeadsUp 通知通常出现在状态栏顶部，显示在当前应用和通知之间，类似于一个浮动的通知条。
+
+这个方法的功能可以分解为以下几个步骤：
+
+### 1. **检查 `mShown` 和 `isShown` 的值**
+   ```java
+   if (mShown != isShown) {
+       mShown = isShown;
+   ```
+   - 方法开始时，首先检查当前的显示状态（`mShown`）与传入的状态（`isShown`）是否一致。如果不一致，说明显示状态发生了变化，所以需要进行相应的更新。
+
+### 2. **处理 `isShown` 为 `true` 的情况**
+   如果 `isShown` 为 `true`，则表示 HeadsUp 通知需要显示或已经显示。以下操作会被执行：
+
+   - **更新父布局的剪辑行为：**
+     ```java
+     updateParentClipping(false /* shouldClip */);
+     ```
+     - 调用 `updateParentClipping` 方法并传入 `false`，表明在显示 HeadsUp 时，不需要裁剪父视图的内容。
+     
+   - **显示 HeadsUp 状态栏视图：**
+     ```java
+     mHeadsUpStatusBarView.setVisibility(View.VISIBLE);
+     show(mHeadsUpStatusBarView);
+     ```
+     - 设置 `mHeadsUpStatusBarView` 的可见性为 `VISIBLE`，并通过 `show` 方法显示它。
+     
+   - **隐藏时钟视图：**
+     ```java
+     hide(mClockView, View.INVISIBLE);
+     ```
+     - 将时钟视图 (`mClockView`) 设置为不可见，`View.INVISIBLE` 意味着它仍然占据布局空间，但不可见。
+     
+   - **隐藏居中的图标视图：**
+     ```java
+     if (mCenteredIconView.getVisibility() != View.GONE) {
+         hide(mCenteredIconView, View.INVISIBLE);
+     }
+     ```
+     - 如果居中的图标视图 (`mCenteredIconView`) 没有被完全隐藏 (`View.GONE`)，则将其设置为不可见。
+     
+   - **隐藏运营商名称视图：**
+     ```java
+     if (mOperatorNameView != null) {
+         hide(mOperatorNameView, View.INVISIBLE);
+     }
+     ```
+     - 如果存在运营商名称视图 (`mOperatorNameView`)，则将其设置为不可见。
+     
+### 3. **处理 `isShown` 为 `false` 的情况**
+   如果 `isShown` 为 `false`，表示 HeadsUp 通知被隐藏或已经消失。以下操作会被执行：
+
+   - **显示时钟视图：**
+     ```java
+     show(mClockView);
+     ```
+     - 将时钟视图 (`mClockView`) 显示出来。
+     
+   - **显示居中的图标视图：**
+     ```java
+     if (mCenteredIconView.getVisibility() != View.GONE) {
+         show(mCenteredIconView);
+     }
+     ```
+     - 如果居中的图标视图 (`mCenteredIconView`) 没有被完全隐藏 (`View.GONE`)，则将其显示出来。
+     
+   - **显示运营商名称视图：**
+     ```java
+     if (mOperatorNameView != null) {
+         show(mOperatorNameView);
+     }
+     ```
+     - 如果存在运营商名称视图 (`mOperatorNameView`)，则将其显示出来。
+     
+   - **隐藏 HeadsUp 状态栏视图：**
+     ```java
+     hide(mHeadsUpStatusBarView, View.GONE, () -> {
+         updateParentClipping(true /* shouldClip */);
+     });
+     ```
+     - 将 HeadsUp 状态栏视图 (`mHeadsUpStatusBarView`) 隐藏，并在隐藏后调用回调函数来更新父视图的剪辑行为。
+
+### 4. **更新状态栏禁用标志**
+   ```java
+   if (mStatusBarStateController.getState() != StatusBarState.SHADE) {
+       mCommandQueue.recomputeDisableFlags(
+               mHeadsUpStatusBarView.getContext().getDisplayId(), false);
+   }
+   ```
+   - 如果当前状态栏不在 **Shade**（即通知面板打开的状态），则重新计算状态栏的禁用标志。禁用标志会影响状态栏图标和其他系统视图的显示。
+
+### 总结：
+`setShown` 方法根据传入的 `isShown` 参数来控制 HeadsUp 通知视图的显示与隐藏。当 HeadsUp 被显示时：
+- 隐藏时钟、运营商名称和居中图标等视图。
+- 显示 HeadsUp 通知视图。
+当 HeadsUp 被隐藏时：
+- 恢复显示时钟、运营商名称和居中图标等视图。
+- 隐藏 HeadsUp 通知视图。
+
+### 与你的需求关系：
+如果你的需求是调整屏幕左上角的运营商名称，在这种情况下，`HeadsUpAppearanceController.java` 可能会涉及到**隐藏和显示运营商名称**（`mOperatorNameView`）。当 HeadsUp 通知显示时，运营商名称会被隐藏，当 HeadsUp 隐藏时，运营商名称会重新显示。
+
+如果你需要在 HeadsUp 显示时调整运营商名称的显示方式，或者希望在显示/隐藏 HeadsUp 时更灵活地处理运营商名称的可见性，`setShown` 方法中的相关逻辑（特别是对 `mOperatorNameView` 的隐藏和显示）会是一个关键点。
+
+---
+
+### frameworks/base/packages/SystemUI/src/com/android/keyguard/KeyguardDisplayManager.java
+
+`KeyguardDisplayManager` 类是 Android 系统中的一个组件，负责管理与屏幕显示和锁屏相关的操作，特别是如何在不同的显示设备（例如外接显示器或投影仪）上显示锁屏界面。它主要处理的是在多屏设备上控制锁屏显示的逻辑。该类通过 `Presentation` 类来显示自定义的锁屏 UI。
+
+### 类的关键组成和功能：
+1. **属性字段：**
+   - `mMediaRouter`：用于管理与外部显示设备（如投影仪、电视等）的连接和路由。
+   - `mDisplayService`：用于管理设备上的显示器，提供显示信息。
+   - `mInjectableInflater`：一个 `InjectionInflationController`，用于在视图中注入依赖项。
+   - `mContext`：上下文，通常是应用程序的环境。
+   - `mShowing`：一个布尔值，表示锁屏是否正在显示。
+   - `mTmpDisplayInfo`：临时存储显示设备信息的 `DisplayInfo` 对象。
+   - `mPresentations`：存储当前正在显示的 `Presentation`（锁屏视图）对象的集合。
+   - `mNavBarController`：导航栏控制器，用于控制显示设备上的导航栏的可见性。
+
+2. **关键方法：**
+   - **构造函数 `KeyguardDisplayManager(Context context, InjectionInflationController injectableInflater)`**：
+     - 初始化类的属性，获取 `MediaRouter` 和 `DisplayManager` 实例，注册显示监听器来处理显示设备的变化。
+
+   - **`isKeyguardShowable(Display display)`**：
+     - 检查是否可以在给定的显示设备上显示锁屏。它会检查以下条件：
+       - 显示设备不能为 `null`。
+       - 不能在默认显示设备上显示锁屏。
+       - 检查显示设备的标志，确保它不是私有显示设备。
+
+   - **`showPresentation(Display display)`**：
+     - 如果该显示设备符合条件（即 `isKeyguardShowable()` 返回 `true`），则显示锁屏界面。
+     - 该方法首先检查当前显示设备是否已有锁屏界面在显示（即 `mPresentations` 中是否存在该设备的 `Presentation`）。
+     - 如果没有，创建一个新的 `KeyguardPresentation` 对象，并显示它。
+
+   - **`hidePresentation(int displayId)`**：
+     - 根据显示设备 ID 隐藏已显示的锁屏界面。
+
+   - **`show()`**：
+     - 启动锁屏显示，首先检查当前是否已显示锁屏。如果没有，则通过 `mMediaRouter.addCallback()` 监听显示设备的变化，并更新显示设备上的锁屏显示。
+   
+   - **`hide()`**：
+     - 隐藏锁屏显示，首先检查当前是否已显示锁屏。如果已经显示，移除显示设备的回调，并清除所有的 `Presentation`（即锁屏视图）。
+
+   - **`updateDisplays(boolean showing)`**：
+     - 根据锁屏的显示状态（`showing` 为 `true` 或 `false`），更新每个显示设备的锁屏显示：
+       - 如果显示锁屏，遍历所有显示设备，检查并显示相应的锁屏界面。
+       - 如果隐藏锁屏，遍历所有显示设备，隐藏其锁屏界面。
+
+   - **`updateNavigationBarVisibility(int displayId, boolean navBarVisible)`**：
+     - 根据锁屏状态控制显示设备上的导航栏是否可见。如果要显示锁屏，隐藏导航栏。如果不显示锁屏，显示导航栏。
+
+3. **`mMediaRouterCallback`**：  
+   - `mMediaRouter` 的回调处理类，处理外部显示设备的选择、取消选择和显示设备变化事件。每次这些事件发生时，它会更新锁屏显示。
+
+4. **`KeyguardPresentation` 类**：
+   - 这是一个 `Presentation` 类，用于在外部显示设备上显示锁屏 UI。锁屏内容的具体视图会通过这个类创建，并在 `onCreate()` 方法中加载布局。
+   - `mClock`：锁屏界面中的时钟控件。
+   - `mMoveTextRunnable`：定期更改时钟位置的逻辑，用于避免屏幕烧伤（屏幕长时间显示相同的图像）。
+
+### 详细分析每个方法的作用：
+1. **构造函数**：
+   - 获取系统服务（`MediaRouter` 和 `DisplayManager`）并注册显示监听器。显示监听器会根据显示设备的变化来更新锁屏显示。
+
+2. **`isKeyguardShowable(Display display)`**：
+   - 判断是否可以在给定的显示设备上显示锁屏，主要检查显示设备是否是默认显示设备或是否是私有显示设备。只允许在外接显示器上显示。
+
+3. **`showPresentation(Display display)`**：
+   - 如果显示设备符合条件，就创建一个新的 `KeyguardPresentation`，并在该显示设备上显示锁屏。
+
+4. **`hidePresentation(int displayId)`**：
+   - 隐藏指定显示设备上的锁屏，移除相应的 `Presentation`。
+
+5. **`show()` 和 `hide()`**：
+   - `show()` 启动锁屏显示，`hide()` 隐藏锁屏显示，且在显示时会监听外部显示设备的变化。
+
+6. **`updateDisplays(boolean showing)`**：
+   - 根据锁屏的显示状态更新每个显示设备上的锁屏界面。
+
+7. **`updateNavigationBarVisibility(int displayId, boolean navBarVisible)`**：
+   - 控制显示设备上导航栏的可见性。
+
+8. **`KeyguardPresentation` 类**：
+   - 在外接显示器上显示锁屏内容。它会显示一个时钟并定期改变时钟的位置，以避免屏幕烧伤。
+
+### 总结：
+`KeyguardDisplayManager` 主要负责管理 Android 系统中多显示设备（如外接显示器、投影仪等）上的锁屏显示。它通过 `Presentation` 类在外接显示器上显示一个自定义的锁屏界面，同时控制显示设备上的导航栏可见性，避免在屏幕上显示不适当的内容。
+
+---
+
+## 各个状态栏的布局
+
+根据你提供的路径，下面是 `SystemUI` 中状态栏（Status Bar）相关布局文件的名称和它们的作用，及每个文件的样式区别。
+
+### 1. **`status_bar.xml`**
+   - **作用**：这是状态栏的主布局文件，包含了状态栏的基本布局元素，例如状态栏的背景、图标、通知等。
+   - **样式特点**：通常定义状态栏的整体结构，可能包括图标容器、时间显示、信号状态、WiFi状态、通知区域等。它通常作为状态栏的根布局文件，可能包括多个子布局。
+
+### 2. **`status_bar_expanded.xml`**
+   - **作用**：定义了当状态栏被扩展（下拉）时的布局。
+   - **样式特点**：此布局通常显示在通知面板打开时，包括通知列表、快捷设置、通知栏的其他视图元素等。它包含了显示通知、快速设置按钮等的容器。
+
+### 3. **`status_bar_mobile_signal_group.xml`**
+   - **作用**：这个布局通常用于显示状态栏中的移动信号相关的 UI 元素。
+   - **样式特点**：包含显示网络信号（例如 LTE 或 5G 信号强度图标）的布局视图，它是用于移动信号的图标展示，例如信号强度图标、运营商名称等。
+
+### 4. **`status_bar_no_notifications.xml`**
+   - **作用**：当没有通知时，状态栏的布局文件。
+   - **样式特点**：在没有通知的情况下，状态栏的显示方式。这个布局通常会去掉通知区的相关视图，可能只保留信号、WiFi、电池状态等信息。
+
+### 5. **`status_bar_notification_footer.xml`**
+   - **作用**：通常用于状态栏通知面板底部的区域。
+   - **样式特点**：包含通知面板的底部部分，通常显示一些附加按钮或信息（例如“清除所有通知”按钮等），或者是一些辅助信息或图标。
+
+### 6. **`status_bar_notification_row.xml`**
+   - **作用**：每条通知的布局文件。
+   - **样式特点**：每个通知在状态栏通知面板中的单独项（例如每条通知的标题、内容、时间等）。这个布局文件定义了单条通知的显示方式，通常包括通知图标、标题、正文和时间等信息。
+
+### 7. **`status_bar_notification_section_header.xml`**
+   - **作用**：通知面板中的分组头部。
+   - **样式特点**：在通知面板中，当通知被分组时，这个布局定义了分组的标题部分，通常是分隔不同通知区域的部分。
+
+### 8. **`status_bar_notification_section_header_contents.xml`**
+   - **作用**：可能用于描述通知组的内容区域。
+   - **样式特点**：这个文件与 `status_bar_notification_section_header.xml` 配合，定义分组内容的显示。它通常在一个分组头部下面显示该组下的通知内容。
+
+### 9. **`status_bar_notification_shelf.xml`**
+   - **作用**：通知面板中的通知展示区域。
+   - **样式特点**：定义通知面板中存放通知的主要区域，通常作为通知的容器，包含多个通知行。
+
+### 10. **`status_bar_toggle_slider.xml`**
+   - **作用**：这个布局文件定义了状态栏中用于显示/操作的滑动开关（例如控制 Wi-Fi、亮度调节、音量调节等）。
+   - **样式特点**：通常用于显示快速设置的滑动条，例如调节亮度、音量等的滑块。
+
+### 11. **`status_bar_wifi_group.xml`**
+   - **作用**：用于显示Wi-Fi相关的状态栏图标。
+   - **样式特点**：显示Wi-Fi图标及其状态，例如 Wi-Fi 信号强度、Wi-Fi连接的网络名称等。通常包括 Wi-Fi 图标和额外的 UI 元素，例如切换按钮。
+
+---
+
+### 样式的区别概述：
+
+- **`status_bar.xml`**：包含状态栏的整体结构，包括所有常规元素（如电池、电信信号、Wi-Fi、时间等）。
+- **`status_bar_expanded.xml`**：当下拉状态栏时，显示通知面板和快捷设置的布局。
+- **`status_bar_mobile_signal_group.xml`**：专门用于显示移动网络信号的布局。
+- **`status_bar_no_notifications.xml`**：没有通知时状态栏的布局。
+- **`status_bar_notification_footer.xml`**：通知面板底部区域，可能包含清除通知按钮等。
+- **`status_bar_notification_row.xml`**：单条通知的布局，展示每个通知的内容。
+- **`status_bar_notification_section_header.xml`**：通知面板分组的标题部分。
+- **`status_bar_notification_section_header_contents.xml`**：通知面板分组内容的布局。
+- **`status_bar_notification_shelf.xml`**：通知列表的容器，存放通知的区域。
+- **`status_bar_toggle_slider.xml`**：包含用于操作的滑动条，控制一些状态（如亮度、音量等）。
+- **`status_bar_wifi_group.xml`**：Wi-Fi相关的图标和信息的布局。
+
+这些布局文件共同组成了 Android 系统UI中状态栏和通知面板的视觉和交互样式，它们通过不同的文件实现不同的部分功能，协同工作提供完整的状态栏和通知体验。
+
+## SPN和operatorShortName
+
+在移动通信领域，`SPN`（Service Provider Name）和 `operatorShortName` 都是用于表示运营商的名称，但它们在用途和使用场景上有一些细微的差别：
+
+1. **SPN (Service Provider Name)**：
+   - SPN 是写在 SIM 卡中的一个字段，用于识别用户当前的服务提供商。
+   - 当用户使用手机网络时，系统会读取 SIM 卡上的 SPN 信息，用于显示网络提供商的名称。
+   - SPN 通常在状态栏或锁屏上显示，例如 "CHT"（中华电信）或 "T-Mobile"。
+   - SPN 的优先级较高，通常是设备显示的首选项，因为它是直接从 SIM 卡读取的。
+
+2. **operatorShortName**：
+   - `operatorShortName` 是 Android 系统中的一个概念，用于表示运营商的简称，通常在 `SubscriptionInfo` 中作为 `getDisplayName()` 的返回值。
+   - 在 Android 中，`operatorShortName` 通常是通过读取 SPN 字段或由设备系统根据 SIM 卡的配置决定。
+   - 如果运营商没有特殊设置 `operatorShortName`，Android 系统可能会显示 `operatorLongName` 的缩写作为 `operatorShortName`。
+
+### SPN 和 operatorShortName 的关系
+- 在许多情况下，`SPN` 和 `operatorShortName` 可以是相同的内容，因为系统会优先显示 SIM 卡中保存的 `SPN` 信息。
+- 如果 SIM 卡中没有 SPN 信息，系统可能会使用 `operatorLongName` 的缩写来显示 `operatorShortName`。
+- 一般来说，`SPN` 是 `operatorShortName` 的来源之一，但 `operatorShortName` 的值还可能根据系统和区域设置的不同而有所调整。
+
+### 实际用途
+- **SPN**：用于显示 SIM 卡上定义的运营商名称，通常在国际漫游时或多个网络之间切换时非常有用。
+- **operatorShortName**：在 Android 系统中用于显示和处理的字段，开发者在操作 SIM 卡信息和显示运营商名称时可以用它来替代 `SPN`。
+
+### 总结
+- **SPN** 是 SIM 卡中存储的服务提供商名称字段，`operatorShortName` 是 Android 系统中用于展示的运营商简称字段。
+- 在大部分场景下，两者是一致的，但 `operatorShortName` 是系统处理后的字段，SPN 是 SIM 卡原始字段。
+
+----
+
+关于运营商名称
+
+```java
+        TelephonyManager telephonyManager = (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
+        String operatorLongName = telephonyManager.getNetworkOperatorName(); // 获取运营商名称
+        String spn = telephonyManager.getSimOperatorNameForPhone(0); // 获取运营商名称
+        // 11-06 15:49:55.241   421   421 D statusbar: mOperatorNameTextView start11111CHT
+        String NetworkOperator = telephonyManager.getNetworkOperator(); // 获取运营商名称
+        // 11-06 15:49:55.241   421   421 D statusbar: mOperatorNameTextView start1111146697
+        String NetworkOperatorName = telephonyManager.getNetworkOperatorName(); // 获取运营商名称
+        // 11-06 15:49:55.241   421   421 D statusbar: mOperatorNameTextView start11111Chunghwa Telecom
+        String SimOperator = telephonyManager.getSimOperator(); // 获取运营商名称
+        // 11-06 15:49:55.241   421   421 D statusbar: mOperatorNameTextView start1111146697
+        String SimOperatorName = telephonyManager.getSimOperatorName(); // 获取运营商名称
+        // 11-06 15:49:55.241   421   421 D statusbar: mOperatorNameTextView start11111CHT
+        Log.d("statusbar","mOperatorNameTextView start11111"+spn);
+        Log.d("statusbar","mOperatorNameTextView start11111"+NetworkOperator);
+        Log.d("statusbar","mOperatorNameTextView start11111"+NetworkOperatorName);
+        Log.d("statusbar","mOperatorNameTextView start11111"+SimOperator);
+        Log.d("statusbar","mOperatorNameTextView start11111"+SimOperatorName);
+```
+
