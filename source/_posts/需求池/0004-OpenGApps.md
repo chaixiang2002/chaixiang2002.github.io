@@ -146,7 +146,52 @@ dumpsys package com.android.vending |grep versionName
 vendor/opengapps/sources/all/priv-app/com.google.android.gsf/29/nodpi/29.apk
 
 vendor/opengapps/sources/arm64/priv-app/com.google.android.gms/29/480/214218039.apk
+
+vendor/opengapps/sources/arm64/priv-app/com.android.vending/23/nodpi/84321600.apk
 ```
 
 google server 24.37.34
 google play 40.0.18-29[0][PR]
+
+
+
+线上最新
+
+```
+4837b41ed131:/ # dumpsys package com.google.android.gsf |grep versionName
+    versionName=10
+4837b41ed131:/ # dumpsys package com.google.android.gms |grep versionName
+    versionName=24.43.36 (100400-691491885)
+    versionName=24.07.13 (100400-607434947)
+4837b41ed131:/ # dumpsys package com.android.vending |grep versionName
+    versionName=43.4.23-29 [0] [PR] 689948425
+    versionName=30.3.21-21 [0] [PR] 445437866
+```
+
+---
+
+最新的谷歌gms
+
+
+
+
+
+
+
+```
+root@antdock:~# docker exec -it android_0 ifconfig |grep 'Mask:255.255.252.0'
+          inet addr:10.20.13.233  Bcast:10.20.15.255  Mask:255.255.252.0 
+root@antdock:~# docker exec -it android_1 ifconfig |grep 'Mask:255.255.252.0'
+          inet addr:10.20.13.234  Bcast:10.20.15.255  Mask:255.255.252.0 
+root@antdock:~# docker exec -it android_2 ifconfig |grep 'Mask:255.255.252.0'
+          inet addr:10.20.13.235  Bcast:10.20.15.255  Mask:255.255.252.0 
+root@antdock:~# docker exec -it android_3 ifconfig |grep 'Mask:255.255.252.0'
+          inet addr:10.20.13.236  Bcast:10.20.15.255  Mask:255.255.252.0 
+root@antdock:~# docker exec -it android_4 ifconfig |grep 'Mask:255.255.252.0'
+          inet addr:10.20.13.237  Bcast:10.20.15.255  Mask:255.255.252.0 
+root@antdock:~# docker exec -it android_5 ifconfig |grep 'Mask:255.255.252.0'
+          inet addr:10.20.13.238  Bcast:10.20.15.255  Mask:255.255.252.0 
+```
+
+
+
