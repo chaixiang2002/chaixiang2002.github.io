@@ -139,3 +139,38 @@ The filesystem on /dev/sdb is now 78643200 (4k) blocks long.
  重要
 
 建议不要使用 Windows 工具或编辑器来修改、移动或访问 `AppData` 文件夹中与 WSL 相关的文件。 这样做可能会导致 Linux 分发版损坏。 如果要从 Windows 访问 Linux 文件，可通过路径 `\\wsl$\<distribution-name>\` 进行访问。 打开 WSL 分发版，然后输入 `explorer.exe .` 来查看此文件夹。 若要了解详细信息，请查看博客文章：[从 Windows 访问 Linux 文件](https://devblogs.microsoft.com/commandline/whats-new-for-wsl-in-windows-10-version-1903/#accessing-linux-files-from-windows)。
+
+---
+
+固定ip的目前方法
+每次执行shell固定ip（还是子网）
+
+```shell
+#!/bin/bash
+#  ~/wsl-ip
+
+# 默认设置
+STATIC_IP="172.23.62.100"  # 设置目标固定IP
+GATEWAY="172.23.48.1"      # 设置网关
+NETMASK="20"               # 子网掩码
+
+# 检查网络接口
+INTERFACE=$(ip route | grep '^default' | awk '{print $5}')
+if [ -z "$INTERFACE" ]; then
+    echo "未找到默认网络接口！请确保WSL网络正常连接。"
+    exit 1
+fi
+
+# 配置静态IP
+echo "正在为接口 $INTERFACE 配置静态IP $STATIC_IP..."
+sudo ip addr flush dev $INTERFACE
+sudo ip addr add $STATIC_IP/$NETMASK dev $INTERFACE
+sudo ip route add default via $GATEWAY
+
+# 验证结果
+echo "新IP地址："
+ip addr show dev $INTERFACE | grep "inet "
+
+echo "WSL的IP地址已更改为 $STATIC_IP，网关为 $GATEWAY。"
+```
+

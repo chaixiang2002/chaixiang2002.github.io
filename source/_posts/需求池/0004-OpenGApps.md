@@ -135,9 +135,9 @@ pm list package |grep gms
 pm list package |grep gsf
 pm list package |grep com.android.vending
 
-dumpsys package com.google.android.gsf |grep versionName
-dumpsys package com.google.android.gms |grep versionName
-dumpsys package com.android.vending |grep versionName
+/system/bin/dumpsys package com.google.android.gsf |grep versionName
+/system/bin/dumpsys package com.google.android.gms |grep versionName
+/system/bin/dumpsys package com.android.vending |grep versionName
 ```
 
 
