@@ -174,3 +174,27 @@ ip addr show dev $INTERFACE | grep "inet "
 echo "WSL的IP地址已更改为 $STATIC_IP，网关为 $GATEWAY。"
 ```
 
+[解决 WSL 开机网卡信息变动问题](https://minsonlee.github.io/2020/11/set-private-ip-for-wsl)
+
+wsl_ip.bat
+
+```bat
+@REM https://minsonlee.github.io/2020/11/set-private-ip-for-wsl
+
+@REM # `WSL 2`新增网卡
+@REM # - 设置私有IP网段为192.168.33.10
+@REM # - 广播地址为192.168.169.15
+@REM # - 网卡名称为 eth0
+@REM # - 设置网卡标签 eth0:1
+wsl -u root ip addr add 192.168.33.10 broadcast 192.168.169.15 dev eth0 label eth0:1
+
+@REM # 设置宿主机网卡`vEthernet (WSL)`地址为 `192.168.33.1`-需要管理员权限
+netsh interface ip add address "vEthernet (WSL)" 192.168.33.1 255.255.255.240
+
+wsl bash -c "echo snow | sudo -S service ssh restart"
+
+```
+
+物理机上执行
+
+![image-20241223091954839](https://cdn.jsdelivr.net/gh/chaixiang2002/repo/picgo/img/202412230919780.png)
