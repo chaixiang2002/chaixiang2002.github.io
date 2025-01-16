@@ -55,7 +55,7 @@ frameworks/base/packages/VpnDialogs/src/com/android/vpndialogs/ConfirmDialog.jav
 frameworks/base/services/accessibility/java/com/android/server/accessibility/AccessibilityManagerService.java//nop-隐藏辅助功能服务列表
 frameworks/base/services/core/java/com/android/server/BatteryService.java//nop-电池模拟
 frameworks/base/services/core/java/com/android/server/ConnectivityService.java//nop-网络模拟
-frameworks/base/services/core/java/com/android/server/PersistentDataBlockService.java//nop??????????????
+frameworks/base/services/core/java/com/android/server/PersistentDataBlockService.java//nop-持久数据块??????????????
 frameworks/base/services/core/java/com/android/server/StorageManagerService.java// 柴祥-重置-文件不可访问
 frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java//nop-监控-监控检测死掉
 frameworks/base/services/core/java/com/android/server/am/AppErrors.java//nop-隐藏APP

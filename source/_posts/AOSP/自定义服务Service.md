@@ -402,6 +402,25 @@ public class MainActivity extends AppCompatActivity {
 
 周总的服务
 
+```
+frameworks/base/core/java/com/android/internal/space/INineDSpace.aidl``//nop-Space
+frameworks/base/core/java/com/android/internal/space/api/IMockCallback.aidl//nop-Space
+frameworks/base/core/java/com/android/internal/space/ConfigProperty.aidl//nop-Space-配置属性
+
+vendor/ntimespace/Space9dService/src/com/android/server/Space9dManagerService.java
+frameworks/base/core/java/com/android/internal/space/api/WiFiMock.java
+frameworks/base/core/java/com/android/internal/space/ConfigProperty.java
+
+frameworks/base/core/java/com/android/internal/space/NineDSpaceManager.java
+没有SystemServer添加服务到ServiceManager
+frameworks/base/Android.bp
+frameworks/base/core/java/android/app/SystemServiceRegistry.java
+执行make api-stubs-docs-update-current-api，自动更新frameworks/base/api/current.txt
+
+frameworks/base/core/java/android/content/Context.java
+
+```
+
 frameworks/base/api/current.txt
 
 frameworks/base/core/java/android/content/Context.java
@@ -411,6 +430,8 @@ frameworks/base/core/java/android/app/SystemServiceRegistry.java
 
 
 frameworks/base/core/java/com/android/internal/space/NineDSpaceManager.java
+
+
 
 frameworks/base/core/java/com/android/internal/space/api/BluetoothMock.java
 
@@ -440,6 +461,9 @@ frameworks/base/Android.bp
 4. 构建文件中添加AIDL的路径，frameworks/base/Android.bp
 5. SystemServer添加服务到ServiceManager，其他组件可以通过 `ServiceManager.getService` 获取到你的服务实例frameworks/base/services/java/com/android/server/SystemServer.java
 6. 注册并指定服务实例的创建，确保系统能够通过 `getSystemService` 方法访问你的服务。frameworks/base/core/java/android/app/SystemServiceRegistry.java
+7. 定义回调frameworks/base/core/java/com/android/henryservice/Callback.aidl
+8. 要用到回调的时候，导入Callback
+9. 执行make api-stubs-docs-update-current-api，自动更新frameworks/base/api/current.txt
 
 
 

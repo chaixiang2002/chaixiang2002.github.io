@@ -1,4 +1,4 @@
-要在AOSP 10中定制Network & Internet设置中的WiFi页面，并实现一个虚拟的WiFi连接，需要修改相关的系统服务和UI代码。以下是找到相关代码文件和实现方法的步骤：
+下拉框要在AOSP 10中定制Network & Internet设置中的WiFi页面，并实现一个虚拟的WiFi连接，需要修改相关的系统服务和UI代码。以下是找到相关代码文件和实现方法的步骤：
 
 ### 1. 找到WiFi设置页面的代码
 
@@ -409,13 +409,14 @@ mWifiManager.setWifiEnabled(isChecked)
 `WifiEnabler` 类中的 `onSwitchToggled` 函数是用于处理用户在设置页面中切换 WiFi 开关时的操作。这个函数具体做了以下几件事：
 
 1. **检查是否由于状态机事件而触发**：
+   
    ```java
    if (mStateMachineEvent) {
        return true;
    }
    ```
-   如果是由于状态机事件（例如，系统状态改变）触发的开关操作，直接返回 `true`，不做进一步处理。
-
+如果是由于状态机事件（例如，系统状态改变）触发的开关操作，直接返回 `true`，不做进一步处理。
+   
 2. **检查飞行模式下是否允许开启 WiFi**：
    ```java
    if (isChecked && !WirelessUtils.isRadioAllowed(mContext, Settings.Global.RADIO_WIFI)) {
@@ -1354,7 +1355,27 @@ WifiStatusTracker.updateWifiState()
     mWifiState:1
 ```
 
+​    try {
 
+​      // if (!mSettingsStore.handleWifiToggled(enable)) {
+
+​      //   // Nothing to do if wifi cannot be toggled
+
+​      //   return true;
+
+​      // }
+
+​      Slog.d(TAG, "mMock.setWifiEnabledState(enable)" + enable);
+
+​      mMock.setWifiEnabledState(enable);
+
+
+
+​    } finally {
+
+​      Binder.restoreCallingIdentity(ident);
+
+​    }
 
 ### wifi设置关闭wifi
 
@@ -1505,7 +1526,7 @@ private final class SignalCallback implements NetworkController.SignalCallback {
 ### 下拉框状态栏获取WiFi状态
 
 ```
-WifiSignalController.notifyListeners(SignalCallback callback)
+    WifiSignalController.notifyListeners(SignalCallback callback)
 	callback.setWifiIndicators(mCurrentState.enabled, ...
 WifiTile WifiSignalCallback setWifiIndicators
 	mInfo.enabled = enabled;
@@ -1630,3 +1651,71 @@ WiFi设置界面的主类。提供WiFi设置界面的功能，包括显示可用
 
 /linux_data/rockchip_android_src/android_10$ md5sum vendor/rockchip/common/vpu/lib/librockit/librockit.so
 828a23b272c82242d23c19f7e8651e23  vendor/rockchip/common/vpu/lib/librockit/librockit.so
+
+----
+
+关于WiFi图标
+
+frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/policy/WifiSignalController.java
+
+wifi图标状态
+
+![image-20250109153738692](https://cdn.jsdelivr.net/gh/chaixiang2002/repo/picgo/img/202501091537393.png)
+
+状态从WifiStatusTracker来
+
+![image-20250109153636513](https://cdn.jsdelivr.net/gh/chaixiang2002/repo/picgo/img/202501091536386.png)
+
+WifiStatusTracker的创建
+
+![image-20250109153957734](https://cdn.jsdelivr.net/gh/chaixiang2002/repo/picgo/img/202501091539543.png)
+
+​    mWifiTracker = new WifiStatusTracker(mContext, wifiManager, networkScoreManager,
+
+​        connectivityManager, this::handleStatusUpdated);
+
+mWifiTracker.setListening(true);
+
+mWifiTracker.refreshLocale();
+
+​    mWifiTracker.handleBroadcast(intent);
+
+**frameworks/base/packages/SettingsLib/src/com/android/settingslib/wifi/WifiStatusTracker.java**
+
+  public void refreshLocale() {
+
+​    updateStatusLabel();
+
+​    mCallback.run();
+
+  }
+
+public void handleBroadcast(Intent intent) {
+
+...
+
+updateWifiState();	
+
+networkInfo.isConnected();
+
+mWifiManager.getConnectionInfo();
+
+getValidSsid(mWifiInfo)
+
+​          updateRssi(mWifiInfo.getRssi());
+
+​          maybeRequestNetworkScore();
+
+​      updateStatusLabel();
+
+​      updateRssi(intent.getIntExtra(WifiManager.EXTRA_NEW_RSSI, -200));
+
+...
+
+}
+
+----------------------
+
+frameworks/base/packages/SystemUI/src/com/android/systemui/qs/tiles/WifiTile.java
+
+mSignalCallback.mInfo.enabled
