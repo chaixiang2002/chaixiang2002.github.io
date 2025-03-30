@@ -6,6 +6,16 @@
 2. lunch                                      #（输入序号或者产品名）选择想要编译的产品![](http://wiki.ntimespace.com/download/attachments/9997017/image2024-1-19_15-51-14.png?version=1&modificationDate=1705650674450&api=v2 "软件研发中心 &gt; 从AOSP10到Redroid10的完整编译教程（含踩坑记录） &gt; image2024-1-19_15-51-14.png")
 3. m                                            #编译该产品
 
+
+
+
+
+```shell
+apt install pigz lz4 libssl-dev
+```
+
+
+
 ## 二、从零开始编译Redroid10
 
 ## 编译Redroid10的大致流程（概要）

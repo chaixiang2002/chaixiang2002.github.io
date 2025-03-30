@@ -507,3 +507,20 @@ root@snowrepo:/snow/android12-rk3588/vendor/ntimespace/google#
 
 ```
 
+
+
+
+
+
+
+-------
+
+```shell
+root@snowrepo:/snow/android10-rk3588/frameworks# jgrep "import com.android.internal.space.GoogleWrapper;"
+
+frameworks/base/core/java/android/app/ActivityThread.java:165
+frameworks/base/services/core/java/com/android/server/pm/permission/PermissionManagerService.java:88
+frameworks/base/services/core/java/com/android/server/pm/PackageManagerService.java:295:
+
+```
+

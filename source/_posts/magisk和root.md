@@ -20,9 +20,8 @@ M1852:/ $ su
 
 屏幕上点击授权
 
-
 /vendor/build.prop
-/vendor/default.prop
+/vendor/default.prop	
 /vendor/package/CTA/system/vendor/vendor.prop
 /vendor/package/ChinaMobile/system/vendor/vendor.prop
 /vendor/package/ChinaTelecom/system/vendor/vendor.prop
